@@ -34,16 +34,20 @@ class TeacherTimetableController extends Controller
 
                 $teacher_id = $request->teacher_id;
 
-                $todayTimetables = DailySchedule::whereDate('date',$date)
+                $todayTimetables = DailySchedule::with(['academicClassSection.class','academicClassSection.section','subject','academicAttendances'])
+                                                ->whereDate('date',$date)
                                                 ->where('teacher_id',$teacher_id)
                                                 ->get();
 
             }else{
                 $today = Carbon::today()->toDateString();
 
+                logger($today);
+
                 $teacher_id = $request->teacher_id;
 
-                $todayTimetables = DailySchedule::whereDate('date',$today)
+                $todayTimetables = DailySchedule::with(['academicClassSection.class','academicClassSection.section','subject','academicAttendances'])
+                                                ->whereDate('date',$today)
                                                 ->where('teacher_id',$teacher_id)
                                                 ->get();
             }
@@ -52,6 +56,10 @@ class TeacherTimetableController extends Controller
                 'success' => true,
                 'data' => $todayTimetables
             ]);
+
+            // return response()->json(
+            //     $todayTimetables
+            // );
 
         }catch(Exception $e){
             return response()->json([
@@ -90,7 +98,6 @@ class TeacherTimetableController extends Controller
                                         })
                                         ->unique('class_name','section_name')
                                         ->values();
-            logger($classes);
 
             return response()->json([
                 'success' => true,
