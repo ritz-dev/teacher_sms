@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Apis;
+namespace App\Http\Controllers\APIs;
 
 use Exception;
 use Carbon\Carbon;
