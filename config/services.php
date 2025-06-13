@@ -18,8 +18,8 @@ return [
         'url' => env('API_GATEWAY_SERVICE_URL'), 
     ],
 
-    'user_gateway' => [ 
-        'url' => env('USER_MANAGEMENT_URL'), 
+    'user' => [ 
+        'url' => env('USER_SERVICE_URL'), 
     ],
 
     'postmark' => [

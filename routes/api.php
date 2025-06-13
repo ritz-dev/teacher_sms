@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\APIs\TeacherController;
 use App\Http\Controllers\APIs\DashboardController;
 use App\Http\Controllers\APIs\TeacherTimetableController;
 
@@ -19,4 +20,8 @@ use App\Http\Controllers\APIs\TeacherTimetableController;
 // });
 
 Route::post('dashboard', [DashboardController::class, 'summary']);
+Route::post('students', [TeacherController::class, 'getStudent']);
+Route::post('subjects', [TeacherController::class, 'getSubjects']);
+Route::post('student-attendance', [TeacherController::class, 'getStudentAttendance']);
+Route::post('student-attendance/store', [TeacherController::class, 'storeStudentAttendance']);
 
