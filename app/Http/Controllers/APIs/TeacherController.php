@@ -5,7 +5,6 @@ use Carbon\Carbon;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Models\AcademicAttendance;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
@@ -95,10 +94,17 @@ class TeacherController extends Controller
         try {
             $subjects = DB::table('weekly_schedules as ws')
                 ->join('subjects as sub', 'ws.subject_slug', '=', 'sub.slug')
+                ->join('academic_class_sections as acs', 'ws.academic_class_section_slug', '=', 'acs.slug')
+                ->join('academic_years as ay', 'acs.academic_year_slug', '=', 'ay.slug')
+                ->join('academic_classes as ac', 'acs.class_slug', '=', 'ac.slug')
+                ->join('sections as sec', 'acs.section_slug', '=', 'sec.slug')
                 ->where('ws.teacher_slug', $validation['owner_slug'])
                 ->select(
                     'sub.slug as subject_slug',
                     'sub.name as subject_name',
+                    'ay.name as academic_year',
+                    'ac.name as class_name',
+                    'sec.name as section_name'
                 )
                 ->distinct()
                 ->get();
