@@ -102,8 +102,11 @@ class TeacherController extends Controller
                 ->select(
                     'sub.slug as subject_slug',
                     'sub.name as subject_name',
-                    'ay.name as academic_year',
+                    'ay.slug as academic_year_slug',
+                    'ay.year as academic_year_name',
+                    'ac.slug as class_slug',
                     'ac.name as class_name',
+                    'sec.slug as section_slug',
                     'sec.name as section_name'
                 )
                 ->distinct()
