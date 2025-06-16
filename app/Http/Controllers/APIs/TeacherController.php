@@ -17,7 +17,6 @@ class TeacherController extends Controller
             $validation = $request->validate([
                 'owner_slug' => 'required|string|max:255',
                 'academic_class_section_slug' => 'nullable|string|max:255',
-                'subject_slug' => 'nullable|string|max:255',
             ]);
 
             $enrollments = DB::table('weekly_schedules as ws')
@@ -25,7 +24,9 @@ class TeacherController extends Controller
                 ->where('ws.teacher_slug', $validation['owner_slug'])
                 ->whereNull('se.deleted_at')
                 ->where('se.status', 'active')
-                ->whereNull('se.deleted_at')   // exclude soft-deleted
+                ->when($validation['academic_class_section_slug'] ?? null, function ($query, $sectionSlug) {
+                    $query->where('se.academic_class_section_slug', $sectionSlug);
+                })
                 ->select(
                     'se.slug as enrollment_slug',
                     'se.student_slug',
