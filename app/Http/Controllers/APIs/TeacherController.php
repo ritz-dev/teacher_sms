@@ -93,6 +93,7 @@ class TeacherController extends Controller
     {
         $validation = $request->validate([
             'owner_slug' => 'required|string|max:255',
+            'academic_class_section_slug' => 'nullable|string|max:255',
         ]);
         
         try {
@@ -103,6 +104,9 @@ class TeacherController extends Controller
                 ->join('academic_classes as ac', 'acs.class_slug', '=', 'ac.slug')
                 ->join('sections as sec', 'acs.section_slug', '=', 'sec.slug')
                 ->where('ws.teacher_slug', $validation['owner_slug'])
+                ->when($validation['academic_class_section_slug'] ?? null, function ($query, $sectionSlug) {
+                    $query->where('ws.academic_class_section_slug', $sectionSlug);
+                })
                 ->select(
                     'sub.slug as subject_slug',
                     'sub.name as subject_name',
