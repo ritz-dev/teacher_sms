@@ -16,7 +16,7 @@ class TeacherController extends Controller
         try {
             $validation = $request->validate([
                 'owner_slug' => 'required|string|max:255',
-                'academic_class_section_slug' => 'required|string|max:255',
+                'academic_class_section_slug' => 'nullable|string|max:255',
                 'subject_slug' => 'nullable|string|max:255',
             ]);
 
