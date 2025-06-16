@@ -16,6 +16,8 @@ class TeacherController extends Controller
         try {
             $validation = $request->validate([
                 'owner_slug' => 'required|string|max:255',
+                'academic_class_section_slug' => 'required|string|max:255',
+                'subject_slug' => 'nullable|string|max:255',
             ]);
 
             $enrollments = DB::table('weekly_schedules as ws')
@@ -316,5 +318,49 @@ class TeacherController extends Controller
         }
     }
 
+    public function getAcademicClassSection (Request $request) {
+
+        $validation = $request->validate([
+            'owner_slug' => 'required|string|max:255',
+        ]);
+        
+        try {
+            $academicClassSections = DB::table('weekly_schedules as ws')
+                ->join('academic_class_sections as acs', 'ws.academic_class_section_slug', '=', 'acs.slug')
+                ->join('academic_years as ay', 'acs.academic_year_slug', '=', 'ay.slug')
+                ->join('academic_classes as ac', 'acs.class_slug', '=', 'ac.slug')
+                ->join('sections as sec', 'acs.section_slug', '=', 'sec.slug')
+                ->where('ws.teacher_slug', $validation['owner_slug'])
+                ->select(
+                    'acs.slug as academic_class_section_slug',
+                    'ac.slug as class_slug',
+                    'ac.name as class_name',
+                    'sec.slug as section_slug',
+                    'sec.name as section_name',
+                    'acs.academic_year_slug',
+                    'ay.year as academic_year_name'
+                )
+                ->distinct()
+                ->get();
+
+            if ($academicClassSections->isEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [],
+                    'message' => 'No academic class sections found for this teacher.',
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $academicClassSections,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 
 }

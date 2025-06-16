@@ -24,4 +24,5 @@ Route::post('students', [TeacherController::class, 'getStudent']);
 Route::post('subjects', [TeacherController::class, 'getSubjects']);
 Route::post('student-attendance', [TeacherController::class, 'getStudentAttendance']);
 Route::post('student-attendance/store', [TeacherController::class, 'storeStudentAttendance']);
+Route::post('academic-class-section', [TeacherController::class, 'getAcademicClassSection']);
 
