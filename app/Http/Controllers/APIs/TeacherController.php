@@ -407,6 +407,11 @@ class TeacherController extends Controller
                 ]);
             }
 
+            $attendanceRecords = $attendanceRecords->map(function ($record) {
+                $record->date = Carbon::createFromFormat('Ymd', (string)$record->date)->format('Y-m-d');
+                return $record;
+            });
+
             return response()->json([
                 'status' => 'success',
                 'data' => $attendanceRecords,
@@ -420,34 +425,42 @@ class TeacherController extends Controller
     }
 
     public function getAttendancePieChart (Request $request) {
-        $validation = $request->validate([
-            'owner_slug' => 'required|string|max:255',
-            'student_slug' => 'required|string|max:255',
-            'academic_class_section_slug' => 'nullable|string|max:255',
-        ]);
+        try {
+            $validation = $request->validate([
+                'owner_slug' => 'required|string|max:255',
+                'student_slug' => 'required|string|max:255',
+                'academic_class_section_slug' => 'nullable|string|max:255',
+            ]);
 
-        $summary = DB::table('academic_attendances')
-            ->selectRaw("
-                SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present,
-                SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) as absent,
-                SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late,
-                SUM(CASE WHEN status = 'excused' THEN 1 ELSE 0 END) as excused,
-                COUNT(*) as total
-            ")
-            ->where('attendee_slug', $student_slug)
-            ->where('attendee_type', 'student')
-            ->when($validation['academic_class_section_slug'] ?? null, function ($query, $sectionSlug) {
-                $query->where('academic_class_section_slug', $sectionSlug);
-            })
-            ->first();
+            $summary = DB::table('academic_attendances')
+                ->selectRaw("
+                    SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present,
+                    SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) as absent,
+                    SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late,
+                    SUM(CASE WHEN status = 'excused' THEN 1 ELSE 0 END) as excused,
+                    COUNT(*) as total
+                ")
+                ->where('attendee_slug', $student_slug)
+                ->where('attendee_type', 'student')
+                ->when($validation['academic_class_section_slug'] ?? null, function ($query, $sectionSlug) {
+                    $query->where('academic_class_section_slug', $sectionSlug);
+                })
+                ->first();
 
-        return response()->json([
-            'present' => (int) $summary->present,
-            'absent' => (int) $summary->absent,
-            'late' => (int) $summary->late,
-            'excused' => (int) $summary->excused,
-            'total' => (int) $summary->total,
-        ]);
+            return response()->json([
+                'present' => (int) $summary->present,
+                'absent' => (int) $summary->absent,
+                'late' => (int) $summary->late,
+                'excused' => (int) $summary->excused,
+                'total' => (int) $summary->total,
+            ]);
+        }
+            catch (\Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => $e->getMessage(),
+                ], 500);
+        }
     }
 
     public function getAttendanceBarChart(Request $request, $student_slug)
