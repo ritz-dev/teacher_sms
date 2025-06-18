@@ -463,17 +463,22 @@ class TeacherController extends Controller
         }
     }
 
-    public function getAttendanceBarChart(Request $request, $student_slug)
+    public function getAttendanceBarChart(Request $request)
     {
         try {
             $validated = $request->validate([
-                'from' => 'required|date',
-                'days' => 'required|integer|min:1|max:60',
+                'owner_slug' => 'required|string|max:255',
+                'student_slug' => 'required|string|max:255',
+                'academic_class_section_slug' => 'nullable|string|max:255',
+                'from' => 'nullable|date', // can be null
+                'days' => 'nullable|integer|min:1|max:60', // can be null
             ]);
         
-            $fromDate = \Carbon\Carbon::parse($validated['from'])->startOfDay();
-            $days = $validated['days'];
-            $toDate = $fromDate->copy()->addDays($days - 1)->endOfDay();
+            $days = $validated['days'] ?? 7;
+        
+            // Default: last 7 days including today
+            $toDate = \Carbon\Carbon::parse($validated['from'] ?? now())->endOfDay();
+            $fromDate = $toDate->copy()->subDays($days - 1)->startOfDay();
         
             $fromInt = (int) $fromDate->format('Ymd');
             $toInt = (int) $toDate->format('Ymd');
@@ -486,14 +491,17 @@ class TeacherController extends Controller
                     SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late,
                     SUM(CASE WHEN status = 'excused' THEN 1 ELSE 0 END) as excused
                 ")
-                ->where('attendee_slug', $student_slug)
+                ->where('attendee_slug', $validated['student_slug'])
                 ->where('attendee_type', 'student')
                 ->whereBetween('date', [$fromInt, $toInt])
+                ->when($validated['academic_class_section_slug'] ?? null, function ($query, $sectionSlug) {
+                    $query->where('academic_class_section_slug', $sectionSlug);
+                })
                 ->groupBy('day')
                 ->orderBy('day', 'asc')
                 ->get();
         
-            // Fill in all days
+            // Build full 7-day range
             $fullDays = collect();
             for ($i = 0; $i < $days; $i++) {
                 $dayCarbon = $fromDate->copy()->addDays($i);
@@ -502,6 +510,7 @@ class TeacherController extends Controller
         
                 $fullDays->push([
                     'date' => $dayCarbon->format('Y-m-d'),
+                    'day' => $dayCarbon->format('D'), // Mon, Tue...
                     'present' => $entry->present ?? 0,
                     'absent' => $entry->absent ?? 0,
                     'late' => $entry->late ?? 0,
