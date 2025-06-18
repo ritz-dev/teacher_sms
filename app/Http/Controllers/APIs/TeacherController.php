@@ -440,7 +440,7 @@ class TeacherController extends Controller
                     SUM(CASE WHEN status = 'excused' THEN 1 ELSE 0 END) as excused,
                     COUNT(*) as total
                 ")
-                ->where('attendee_slug', $student_slug)
+                ->where('attendee_slug', $validation['student_slug'])
                 ->where('attendee_type', 'student')
                 ->when($validation['academic_class_section_slug'] ?? null, function ($query, $sectionSlug) {
                     $query->where('academic_class_section_slug', $sectionSlug);
