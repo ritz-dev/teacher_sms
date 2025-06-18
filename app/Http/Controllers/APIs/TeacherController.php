@@ -370,7 +370,6 @@ class TeacherController extends Controller
 
     public function getAttendanceByStudent (Request $request) {
         try {
-
             $validation = $request->validate([
                 'owner_slug' => 'required|string|max:255',
                 'student_slug' => 'required|string|max:255',
@@ -477,7 +476,7 @@ class TeacherController extends Controller
             $days = $validated['days'] ?? 7;
         
             // Default: last 7 days including today
-            $toDate = \Carbon\Carbon::parse($validated['from'] ?? now())->endOfDay();
+            $toDate = Carbon::parse($validated['from'] ?? now())->endOfDay();
             $fromDate = $toDate->copy()->subDays($days - 1)->startOfDay();
         
             $fromInt = (int) $fromDate->format('Ymd');
@@ -511,10 +510,10 @@ class TeacherController extends Controller
                 $fullDays->push([
                     'date' => $dayCarbon->format('Y-m-d'),
                     'day' => $dayCarbon->format('D'), // Mon, Tue...
-                    'present' => $entry->present ?? 0,
-                    'absent' => $entry->absent ?? 0,
-                    'late' => $entry->late ?? 0,
-                    'excused' => $entry->excused ?? 0,
+                    'present' => int($entry->present) ?? 0,
+                    'absent' => int($entry->absent) ?? 0,
+                    'late' => int($entry->late) ?? 0,
+                    'excused' => int($entry->excused) ?? 0,
                 ]);
             }
         
