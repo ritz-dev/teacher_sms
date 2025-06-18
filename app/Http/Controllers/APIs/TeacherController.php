@@ -368,4 +368,140 @@ class TeacherController extends Controller
         }
     }
 
+    public function getAttendanceByStudent (Request $request) {
+        try {
+
+            $validation = $request->validate([
+                'owner_slug' => 'required|string|max:255',
+                'student_slug' => 'required|string|max:255',
+                'academic_class_section_slug' => 'nullable|string|max:255',
+            ]);
+
+            $attendanceRecords = DB::table('academic_attendances')
+                ->where('attendee_slug', $validation['student_slug'])
+                ->where('attendee_type', 'student')
+                ->when($validation['academic_class_section_slug'] ?? null, function ($query, $sectionSlug) {
+                    $query->where('academic_class_section_slug', $sectionSlug);
+                })
+                ->select(
+                    'slug',
+                    'weekly_schedule_slug',
+                    'subject',
+                    'academic_class_section_slug',
+                    'academic_info',
+                    'attendee_slug',
+                    'attendee_name',
+                    'status',
+                    'attendance_type',
+                    'date',
+                    'remark'
+                )
+                ->orderBy('date', 'desc')
+                ->get();
+
+            if ($attendanceRecords->isEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [],
+                    'message' => 'No attendance records found for this student.',
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $attendanceRecords,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function getAttendancePieChart (Request $request) {
+        $validation = $request->validate([
+            'owner_slug' => 'required|string|max:255',
+            'student_slug' => 'required|string|max:255',
+            'academic_class_section_slug' => 'nullable|string|max:255',
+        ]);
+
+        $summary = DB::table('academic_attendances')
+            ->selectRaw("
+                SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present,
+                SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) as absent,
+                SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late,
+                SUM(CASE WHEN status = 'excused' THEN 1 ELSE 0 END) as excused,
+                COUNT(*) as total
+            ")
+            ->where('attendee_slug', $student_slug)
+            ->where('attendee_type', 'student')
+            ->when($validation['academic_class_section_slug'] ?? null, function ($query, $sectionSlug) {
+                $query->where('academic_class_section_slug', $sectionSlug);
+            })
+            ->first();
+
+        return response()->json([
+            'present' => (int) $summary->present,
+            'absent' => (int) $summary->absent,
+            'late' => (int) $summary->late,
+            'excused' => (int) $summary->excused,
+            'total' => (int) $summary->total,
+        ]);
+    }
+
+    public function getAttendanceBarChart(Request $request, $student_slug)
+    {
+        try {
+            $validated = $request->validate([
+                'from' => 'required|date',
+                'days' => 'required|integer|min:1|max:60',
+            ]);
+        
+            $fromDate = \Carbon\Carbon::parse($validated['from'])->startOfDay();
+            $days = $validated['days'];
+            $toDate = $fromDate->copy()->addDays($days - 1)->endOfDay();
+        
+            $fromInt = (int) $fromDate->format('Ymd');
+            $toInt = (int) $toDate->format('Ymd');
+        
+            $rawData = DB::table('academic_attendances')
+                ->selectRaw("
+                    date as day,
+                    SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present,
+                    SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) as absent,
+                    SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late,
+                    SUM(CASE WHEN status = 'excused' THEN 1 ELSE 0 END) as excused
+                ")
+                ->where('attendee_slug', $student_slug)
+                ->where('attendee_type', 'student')
+                ->whereBetween('date', [$fromInt, $toInt])
+                ->groupBy('day')
+                ->orderBy('day', 'asc')
+                ->get();
+        
+            // Fill in all days
+            $fullDays = collect();
+            for ($i = 0; $i < $days; $i++) {
+                $dayCarbon = $fromDate->copy()->addDays($i);
+                $dayInt = (int) $dayCarbon->format('Ymd');
+                $entry = $rawData->firstWhere('day', $dayInt);
+        
+                $fullDays->push([
+                    'date' => $dayCarbon->format('Y-m-d'),
+                    'present' => $entry->present ?? 0,
+                    'absent' => $entry->absent ?? 0,
+                    'late' => $entry->late ?? 0,
+                    'excused' => $entry->excused ?? 0,
+                ]);
+            }
+        
+            return response()->json($fullDays);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

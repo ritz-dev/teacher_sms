@@ -25,4 +25,6 @@ Route::post('subjects', [TeacherController::class, 'getSubjects']);
 Route::post('student-attendance', [TeacherController::class, 'getStudentAttendance']);
 Route::post('student-attendance/store', [TeacherController::class, 'storeStudentAttendance']);
 Route::post('academic-class-section', [TeacherController::class, 'getAcademicClassSection']);
-
+Route::post('students/attendance', [TeacherController::class, 'getAttendanceByStudent']);
+Route::post('students/attendance/chart/pie', [TeacherController::class, 'getAttendancePieChart']);
+Route::post('students/attendance/chart/bar', [TeacherController::class, 'getAttendanceBarChart']);
