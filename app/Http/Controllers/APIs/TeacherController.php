@@ -469,14 +469,14 @@ class TeacherController extends Controller
                 'owner_slug' => 'required|string|max:255',
                 'student_slug' => 'required|string|max:255',
                 'academic_class_section_slug' => 'nullable|string|max:255',
-                'from' => 'nullable|date', // can be null
+                'date' => 'nullable|integer', // can be null
                 'days' => 'nullable|integer|min:1|max:60', // can be null
             ]);
         
             $days = $validated['days'] ?? 7;
         
             // Default: last 7 days including today
-            $toDate = Carbon::parse($validated['from'] ?? now())->endOfDay();
+            $toDate = Carbon::parse($validated['date'] ?? now())->endOfDay();
             $fromDate = $toDate->copy()->subDays($days - 1)->startOfDay();
         
             $fromInt = (int) $fromDate->format('Ymd');
