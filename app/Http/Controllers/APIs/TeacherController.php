@@ -469,19 +469,22 @@ class TeacherController extends Controller
                 'owner_slug' => 'required|string|max:255',
                 'student_slug' => 'required|string|max:255',
                 'academic_class_section_slug' => 'nullable|string|max:255',
-                'date' => 'nullable|integer', // can be null
-                'days' => 'nullable|integer|min:1|max:60', // can be null
+                'date' => 'nullable|integer', // format: Ymd e.g., 20250619
+                'days' => 'nullable|integer|min:1|max:60',
             ]);
-        
+    
+            // Parse date or use now
+            $toDate = isset($validated['date'])
+                ? Carbon::createFromFormat('Ymd', $validated['date'])->endOfDay()
+                : now()->endOfDay();
+    
             $days = $validated['days'] ?? 7;
-        
-            // Default: last 7 days including today
-            $toDate = Carbon::parse($validated['date'] ?? now())->endOfDay();
             $fromDate = $toDate->copy()->subDays($days - 1)->startOfDay();
-        
+    
             $fromInt = (int) $fromDate->format('Ymd');
             $toInt = (int) $toDate->format('Ymd');
-        
+    
+            // Fetch grouped attendance data
             $rawData = DB::table('academic_attendances')
                 ->selectRaw("
                     date as day,
@@ -499,24 +502,24 @@ class TeacherController extends Controller
                 ->groupBy('day')
                 ->orderBy('day', 'asc')
                 ->get();
-        
-            // Build full 7-day range
+    
+            // Build complete date range
             $fullDays = collect();
             for ($i = 0; $i < $days; $i++) {
                 $dayCarbon = $fromDate->copy()->addDays($i);
                 $dayInt = (int) $dayCarbon->format('Ymd');
                 $entry = $rawData->firstWhere('day', $dayInt);
-        
+    
                 $fullDays->push([
                     'date' => $dayCarbon->format('Y-m-d'),
                     'day' => $dayCarbon->format('D'), // Mon, Tue...
-                    'present' => int($entry->present) ?? 0,
-                    'absent' => int($entry->absent) ?? 0,
-                    'late' => int($entry->late) ?? 0,
-                    'excused' => int($entry->excused) ?? 0,
+                    'present' => isset($entry) ? (int) $entry->present : 0,
+                    'absent' => isset($entry) ? (int) $entry->absent : 0,
+                    'late' => isset($entry) ? (int) $entry->late : 0,
+                    'excused' => isset($entry) ? (int) $entry->excused : 0,
                 ]);
             }
-        
+    
             return response()->json($fullDays);
         } catch (\Exception $e) {
             return response()->json([
