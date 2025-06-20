@@ -41,6 +41,8 @@ class DashboardController extends Controller
                 ->where('ws.teacher_slug', $validation['owner_slug'])
                 ->where('acs.academic_year_slug', $currentAcademicYear) // 👈 correct filtering here
                 ->select(
+                    'ws.slug as weekly_schedule_slug',
+                    'ws.academic_class_section_slug',
                     'ws.day_of_week',
                     'ac.name as class_name',
                     'sec.name as section_name',
