@@ -3,21 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\APIs\TeacherController;
 use App\Http\Controllers\APIs\DashboardController;
-use App\Http\Controllers\APIs\TeacherTimetableController;
-
-// Route::prefix('timetable')->group(function(){
-
-//     Route::post('today-timetable',[TeacherTimetableController::class,'todayTimetable']);
-
-//     Route::post('class-timetable',[TeacherTimetableController::class,'classInTimetable']);
-
-//     Route::post('student-timetable',[TeacherTimetableController::class,'studentInTimetable']);
-
-//     Route::post('subject-timetable',[TeacherTimetableController::class,'subjectInTimetable']);
-
-//     Route::post('student-attendance-timetable',[TeacherTimetableController::class,'studentAttendanceInTimetable']);
-
-// });
+use App\Http\Controllers\APIs\AssessmentController;
+use App\Http\Controllers\APIs\AssessmentResultController;
 
 Route::post('dashboard', [DashboardController::class, 'summary']);
 Route::post('students', [TeacherController::class, 'getStudent']);
@@ -28,3 +15,17 @@ Route::post('academic-class-section', [TeacherController::class, 'getAcademicCla
 Route::post('students/attendance', [TeacherController::class, 'getAttendanceByStudent']);
 Route::post('students/attendance/chart/pie', [TeacherController::class, 'getAttendancePieChart']);
 Route::post('students/attendance/chart/bar', [TeacherController::class, 'getAttendanceBarChart']);
+
+Route::prefix('assessments')->group(function () {
+    Route::post('', [AssessmentController::class, 'index']);
+    Route::post('store', [AssessmentController::class, 'store']);
+    Route::post('update', [AssessmentController::class, 'update']);
+    Route::post('delete', [AssessmentController::class, 'delete']);
+});
+
+Route::prefix('assessments-result')->group(function () {
+    Route::post('', [AssessmentResultController::class, 'index']);
+    Route::post('store', [AssessmentResultController::class, 'store']);
+    Route::post('update', [AssessmentResultController::class, 'update']);
+    Route::post('delete', [AssessmentResultController::class, 'delete']);
+});
