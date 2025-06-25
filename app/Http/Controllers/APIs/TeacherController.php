@@ -115,7 +115,8 @@ class TeacherController extends Controller
                     'ac.slug as class_slug',
                     'ac.name as class_name',
                     'sec.slug as section_slug',
-                    'sec.name as section_name'
+                    'sec.name as section_name',
+                    'acs.slug as academic_class_section_slug',
                 )
                 ->distinct()
                 ->get();
