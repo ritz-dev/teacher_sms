@@ -73,8 +73,7 @@ class TeacherController extends Controller
                 $enrollment = (array) $enrollment;
                 $enrollment['student'] = $studentsMap->get($enrollment['student_slug']) ?? null;
                 return $enrollment;
-            });
-        
+            })->unique('student_slug')->values();
                
             return response()->json([
                 'status' => 'success',

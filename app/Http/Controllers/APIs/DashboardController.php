@@ -57,6 +57,7 @@ class DashboardController extends Controller
                 ->orderByRaw("FIELD(ws.day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
                 ->orderBy('ws.start_time')
                 ->get();
+                
             $todaySchedule = $weeklySchedule->where('day_of_week', $today)->values();
             
             return response()->json([
