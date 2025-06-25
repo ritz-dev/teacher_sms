@@ -28,6 +28,8 @@ class AssessmentController extends Controller
             ]);
 
             $query = DB::table('assessments')
+                ->leftJoin('subjects as sub', 'assessments.subject_slug', '=', 'sub.slug')
+                ->leftJoin('academic_class_sections as acs', 'assessments.academic_class_section_slug', '=', 'acs.slug')    
                 ->when(!empty($validated['teacher_slug']), function ($q) use ($validated) {
                     $q->where('teacher_slug', $validated['teacher_slug']);
                 })
@@ -69,7 +71,19 @@ class AssessmentController extends Controller
                 $query->take($validated['limit']);
             }
 
-            $results = $query->get();
+            $results = $query->get([
+                'slug',
+                'title',
+                'academic_class_section_slug',
+                'subject_slug',
+                'type',
+                'date',
+                'due_date',
+                'max_marks',
+                'min_marks',
+                'description',
+                'is_published'
+            ]);
 
             return response()->json([
                 'status' => 'OK! The request was successful',

@@ -25,16 +25,20 @@ class DashboardController extends Controller
                 ->where('status', 'In Progress')
                 ->value('slug');
 
-            $totalStudents = DB::table('weekly_schedules as ws')    
+            $totalStudents = DB::table('weekly_schedules as ws')
                 ->join('student_enrollments as se', 'ws.academic_class_section_slug', '=', 'se.academic_class_section_slug')
+                ->join('academic_class_sections as acs', 'ws.academic_class_section_slug', '=', 'acs.slug')
                 ->where('ws.teacher_slug', $validation['owner_slug'])
+                ->where('acs.academic_year_slug', $currentAcademicYear)
                 ->whereNull('se.deleted_at')
                 ->distinct('se.student_slug')
                 ->count('se.student_slug');
             
-            $subjects = DB::table('weekly_schedules')
-                ->where('teacher_slug', $validation['owner_slug'])
-                ->select('subject_slug', 'subject_name')
+            $subjects = DB::table('weekly_schedules as ws')
+                ->join('academic_class_sections as acs', 'ws.academic_class_section_slug', '=', 'acs.slug')
+                ->where('ws.teacher_slug', $validation['owner_slug'])
+                ->where('acs.academic_year_slug', $currentAcademicYear)
+                ->select('ws.subject_slug', 'ws.subject_name')
                 ->distinct()
                 ->get();
 
@@ -57,7 +61,7 @@ class DashboardController extends Controller
                 ->orderByRaw("FIELD(ws.day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
                 ->orderBy('ws.start_time')
                 ->get();
-                
+
             $todaySchedule = $weeklySchedule->where('day_of_week', $today)->values();
             
             return response()->json([

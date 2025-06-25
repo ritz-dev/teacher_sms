@@ -5,7 +5,6 @@ namespace App\Http\Controllers\APIs;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Subject;
-use App\Models\AcademicYear;
 use Illuminate\Http\Request;
 use App\Models\DailySchedule;
 use App\Models\StudentEnrollment;
