@@ -19,7 +19,12 @@ class DashboardController extends Controller
 
             $today = Carbon::now()->format('l');
 
-            $currentAcademicYear = '10000000000000000000000000000000000';
+            $currentAcademicYear = DB::table('academic_years')
+                // ->where('start_date', '<=', $todayDate)
+                // ->where('end_date', '>=', $todayDate)
+                ->where('status', 'In Progress')
+                ->value('slug')
+                ->first();
 
             $totalStudents = DB::table('weekly_schedules as ws')    
                 ->join('student_enrollments as se', 'ws.academic_class_section_slug', '=', 'se.academic_class_section_slug')
