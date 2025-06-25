@@ -36,10 +36,8 @@ class TeacherController extends Controller
                     'se.admission_date',
                     'se.status',
                     'se.academic_class_section_slug',
-                    'se.academic_info',
-                    'ws.slug as weekly_schedule_slug',
+                    'se.academic_info'
                 )
-                ->distinct()
                 ->get();
 
             if ($enrollments->isEmpty()) {
@@ -50,7 +48,10 @@ class TeacherController extends Controller
                 ]);
             }
 
-            $studentSlugs = $enrollments->pluck('student_slug')->unique()->values()->all();
+            // Make enrollments unique by student_slug
+            $uniqueEnrollments = $enrollments->unique('student_slug')->values();
+
+            $studentSlugs = $uniqueEnrollments->pluck('student_slug')->all();
 
             $studentApiUrl = config('services.user.url') . 'students';
 
@@ -69,17 +70,16 @@ class TeacherController extends Controller
             $studentsData = $response->json('data') ?? [];
             $studentsMap = collect($studentsData)->keyBy('slug');
 
-            $combined = $enrollments->map(function ($enrollment) use ($studentsMap) {
+            $combined = $uniqueEnrollments->map(function ($enrollment) use ($studentsMap) {
                 $enrollment = (array) $enrollment;
                 $enrollment['student'] = $studentsMap->get($enrollment['student_slug']) ?? null;
                 return $enrollment;
-            })->unique('student_slug')->values();
-               
+            });
+
             return response()->json([
                 'status' => 'success',
                 'data' => $combined,
             ]);
-            
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
