@@ -28,8 +28,8 @@ class AssessmentController extends Controller
             ]);
 
             $query = DB::table('assessments')
-                ->leftJoin('subjects as sub', 'assessments.subject_slug', '=', 'sub.slug')
-                ->leftJoin('academic_class_sections as acs', 'assessments.academic_class_section_slug', '=', 'acs.slug')    
+                ->join('subjects as sub', 'assessments.subject_slug', '=', 'sub.slug')
+                ->join('academic_class_sections as acs', 'assessments.academic_class_section_slug', '=', 'acs.slug')    
                 ->when(!empty($validated['teacher_slug']), function ($q) use ($validated) {
                     $q->where('teacher_slug', $validated['teacher_slug']);
                 })
@@ -60,6 +60,21 @@ class AssessmentController extends Controller
                 ->when(!empty($validated['end_date']) && empty($validated['start_date']), function ($q) use ($validated) {
                     $q->where('date', '<=', Carbon::parse($validated['end_date'])->format('Ymd'));
                 })
+                ->select(
+                    'slug',
+                    'title',
+                    'teacher_slug',
+                    'academic_class_section_slug',
+                    'subject_slug',
+                    'sub.name as subject_name',
+                    'type',
+                    'date',
+                    'due_date',
+                    'max_marks',
+                    'min_marks',
+                    'description',
+                    'is_published',
+                )
                 ->orderByDesc('date');
 
             $total = (clone $query)->count();
