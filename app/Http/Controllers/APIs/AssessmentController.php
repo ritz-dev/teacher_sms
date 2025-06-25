@@ -27,7 +27,7 @@ class AssessmentController extends Controller
                 'skip' => ['nullable', 'integer', 'min:0'],
             ]);
 
-            $query = DB::table('assessments')
+            $query = DB::table('assessments as as')
                 ->join('subjects as sub', 'assessments.subject_slug', '=', 'sub.slug')
                 ->join('academic_class_sections as acs', 'assessments.academic_class_section_slug', '=', 'acs.slug')    
                 ->when(!empty($validated['teacher_slug']), function ($q) use ($validated) {
@@ -61,19 +61,19 @@ class AssessmentController extends Controller
                     $q->where('date', '<=', Carbon::parse($validated['end_date'])->format('Ymd'));
                 })
                 ->select(
-                    'slug',
-                    'title',
-                    'teacher_slug',
-                    'academic_class_section_slug',
-                    'subject_slug',
+                    'as.slug as slug',
+                    'as.title as title',
+                    'as.teacher_slug as teacher_slug',
+                    'as.academic_class_section_slug as academic_class_section_slug',
+                    'as.subject_slug as subject_slug',
                     'sub.name as subject_name',
-                    'type',
-                    'date',
-                    'due_date',
-                    'max_marks',
-                    'min_marks',
-                    'description',
-                    'is_published',
+                    'as.type as type',
+                    'as.date as date',
+                    'as.due_date as due_date',
+                    'as.max_marks as max_marks',
+                    'as.min_marks as min_marks',
+                    'as.description as description',
+                    'as.is_published as is_published',
                 )
                 ->orderByDesc('date');
 
