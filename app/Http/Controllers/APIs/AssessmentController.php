@@ -71,19 +71,7 @@ class AssessmentController extends Controller
                 $query->take($validated['limit']);
             }
 
-            $results = $query->get([
-                'slug',
-                'title',
-                'academic_class_section_slug',
-                'subject_slug',
-                'type',
-                'date',
-                'due_date',
-                'max_marks',
-                'min_marks',
-                'description',
-                'is_published'
-            ]);
+            $results = $query->get();
 
             return response()->json([
                 'status' => 'OK! The request was successful',
