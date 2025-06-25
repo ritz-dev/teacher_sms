@@ -28,8 +28,8 @@ class AssessmentController extends Controller
             ]);
 
             $query = DB::table('assessments as as')
-                ->join('subjects as sub', 'assessments.subject_slug', '=', 'sub.slug')
-                ->join('academic_class_sections as acs', 'assessments.academic_class_section_slug', '=', 'acs.slug')    
+                ->join('subjects as sub', 'as.subject_slug', '=', 'sub.slug')
+                ->join('academic_class_sections as acs', 'as.academic_class_section_slug', '=', 'acs.slug')    
                 ->when(!empty($validated['teacher_slug']), function ($q) use ($validated) {
                     $q->where('teacher_slug', $validated['teacher_slug']);
                 })
