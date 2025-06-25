@@ -101,6 +101,12 @@ class TeacherController extends Controller
             'owner_slug' => 'required|string|max:255',
             'academic_class_section_slug' => 'nullable|string|max:255',
         ]);
+
+        $currentAcademicYear = DB::table('academic_years')
+                // ->where('start_date', '<=', $todayDate)
+                // ->where('end_date', '>=', $todayDate)
+                ->where('status', 'In Progress')
+                ->value('slug');
         
         try {
             $subjects = DB::table('weekly_schedules as ws')
