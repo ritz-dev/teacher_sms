@@ -23,8 +23,7 @@ class DashboardController extends Controller
                 // ->where('start_date', '<=', $todayDate)
                 // ->where('end_date', '>=', $todayDate)
                 ->where('status', 'In Progress')
-                ->value('slug')
-                ->get();
+                ->value('slug');
 
             $totalStudents = DB::table('weekly_schedules as ws')    
                 ->join('student_enrollments as se', 'ws.academic_class_section_slug', '=', 'se.academic_class_section_slug')
