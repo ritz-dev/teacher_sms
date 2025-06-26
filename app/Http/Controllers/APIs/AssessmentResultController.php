@@ -73,6 +73,36 @@ class AssessmentResultController extends Controller
         }
     }
 
+    public function getResultsByStudent(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'student_slug' => 'required|string',
+                'assessment_slug' => 'nullable|array',
+                'assessment_slug.*' => 'string|exists:assessments,slug',
+            ]);
+
+            $query = DB::table('assessment_results')
+                ->where('student_slug', $validated['student_slug']);
+
+            if (!empty($validated['assessment_slug'])) {
+                $query->whereIn('assessment_slug', $validated['assessment_slug']);
+            }
+            $results = $query->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $results,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch assessment results for student.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
