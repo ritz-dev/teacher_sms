@@ -110,7 +110,7 @@ class AssessmentController extends Controller
             ]);
 
         $assessments = DB::table('assessment_results as asr')
-            ->join('assessments as', 'asr.assessment_slug', '=', 'as.slug')
+            ->join('assessments as as', 'asr.assessment_slug', '=', 'as.slug')
             ->where('assessment_results.student_slug', $validated['student_slug'])
             ->select(
                 'as.slug as assessment_slug',
