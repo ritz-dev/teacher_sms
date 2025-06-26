@@ -27,6 +27,7 @@ class TeacherController extends Controller
 
             $enrollments = DB::table('weekly_schedules as ws')
                 ->join('student_enrollments as se', 'ws.academic_class_section_slug', '=', 'se.academic_class_section_slug')
+                ->join('academic_class_sections as acs', 'ws.academic_class_section_slug', '=', 'acs.slug')
                 ->where('ws.teacher_slug', $validation['owner_slug'])
                 ->where('acs.academic_year_slug', $currentAcademicYear)
                 ->whereNull('se.deleted_at')
