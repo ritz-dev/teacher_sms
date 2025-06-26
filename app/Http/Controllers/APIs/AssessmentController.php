@@ -101,6 +101,37 @@ class AssessmentController extends Controller
         }
     }
 
+    public function getAssessmentsByStudent(Request $request)
+    {
+        try {
+
+        $validated = $request->validate([
+                'student_slug' => ['nullable', 'string'],
+            ]);
+
+        $assessments = DB::table('assessment_results as asr')
+            ->join('assessments as', 'asr.assessment_slug', '=', 'as.slug')
+            ->where('assessment_results.student_slug', $validated['student_slug'])
+            ->select(
+                'as.slug as assessment_slug',
+                'as.name as assessment_name',
+            )
+            ->get();
+
+        return response()->json([
+            'status' => 'OK',
+            'data' => $assessments
+        ]);
+        
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch assessments for student.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function show(Request $request)
     {
         try {

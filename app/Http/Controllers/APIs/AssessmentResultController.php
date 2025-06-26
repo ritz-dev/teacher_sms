@@ -15,7 +15,7 @@ class AssessmentResultController extends Controller
         try {
             $validated = $request->validate([
                 'assessment_slug' => ['nullable', 'string', 'exists:assessments,slug'],
-                'student_slug' => ['nullable', 'string', 'exists:students,slug'],
+                'student_slug' => ['nullable', 'string'],
                 'status' => ['nullable', 'in:pending,graded,reviewed'],
                 'limit' => ['nullable', 'integer', 'min:1'],
                 'skip' => ['nullable', 'integer', 'min:0'],

@@ -21,6 +21,7 @@ Route::prefix('assessments')->group(function () {
     Route::post('store', [AssessmentController::class, 'store']);
     Route::post('update', [AssessmentController::class, 'update']);
     Route::post('delete', [AssessmentController::class, 'delete']);
+    Route::post('get-by-student', [AssessmentController::class, 'getAssessmentsByStudent']);
 });
 
 Route::prefix('assessments-result')->group(function () {
