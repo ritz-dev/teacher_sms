@@ -23,6 +23,7 @@ class AttendanceController extends Controller
             $attendances = DB::table('academic_attendances')
                 ->join('academic_class_sections', 'academic_attendances.academic_class_section_slug', '=', 'academic_class_sections.slug')
                 ->where('academic_attendances.attendee_type', 'student')
+                ->where('academic_attendances.attendee_slug', $validated['student_slug'])
                 ->where('academic_class_sections.academic_year_slug', $currentAcademicYear)
                 ->select(
                     'academic_attendances.slug as attendance_slug',

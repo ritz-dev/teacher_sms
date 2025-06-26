@@ -37,7 +37,6 @@ class TeacherTimetableController extends Controller
                                                 ->whereDate('date',$date)
                                                 ->where('teacher_id',$teacher_id)
                                                 ->get();
-
             }else{
                 $today = Carbon::today()->toDateString();
 
