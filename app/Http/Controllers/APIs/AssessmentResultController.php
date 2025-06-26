@@ -22,10 +22,24 @@ class AssessmentResultController extends Controller
             ]);
 
             $query = DB::table('assessment_results')
+                ->join('assessments', 'assessment_results.assessment_slug', '=', 'assessments.slug')
+                ->join('subjects', 'assessments.subject_slug', '=', 'subjects.slug')
                 ->when(!empty($validated['assessment_slug']), fn($q) => $q->where('assessment_slug', $validated['assessment_slug']))
                 ->when(!empty($validated['student_slug']), fn($q) => $q->where('student_slug', $validated['student_slug']))
                 ->when(!empty($validated['status']), fn($q) => $q->where('status', $validated['status']))
-                ->orderByDesc('created_at');
+                ->orderByDesc('created_at')
+                ->select(
+                    'assessment_results.slug as result_slug',
+                    'assessment_results.assessment_slug as assessment_slug',
+                    'assessment_results.student_slug as student_slug',
+                    'assessment_results.marks_obtained as marks_obtained',
+                    'assessment_results.remarks as remarks',
+                    'assessment_results.status as status',
+                    'assessment_results.graded_by as graded_by',
+                    'assessment_results.graded_at as graded_at',
+                    'assessments.name as assessment_name',
+                    'subjects.name as subject_name',
+                );
 
             $total = (clone $query)->count();
 
@@ -83,8 +97,22 @@ class AssessmentResultController extends Controller
             ]);
 
             $query = DB::table('assessment_results')
-                ->where('student_slug', $validated['student_slug']);
-
+            ->join('assessments', 'assessment_results.assessment_slug', '=', 'assessments.slug')
+            ->join('subjects', 'assessments.subject_slug', '=', 'subjects.slug')
+            ->where('student_slug', $validated['student_slug'])
+            ->select(
+                'assessment_results.slug as result_slug',
+                'assessment_results.assessment_slug as assessment_slug',
+                'assessment_results.student_slug as student_slug',
+                'assessment_results.marks_obtained as marks_obtained',
+                'assessment_results.remarks as remarks',
+                'assessment_results.status as status',
+                'assessment_results.graded_by as graded_by',
+                'assessment_results.graded_at as graded_at',
+                'assessments.name as assessment_name',
+                'subjects.name as subject_name',
+            );
+                
             if (!empty($validated['assessment_slug'])) {
                 $query->whereIn('assessment_slug', $validated['assessment_slug']);
             }
