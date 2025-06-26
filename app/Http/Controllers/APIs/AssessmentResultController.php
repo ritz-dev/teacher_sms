@@ -96,23 +96,23 @@ class AssessmentResultController extends Controller
                 'assessments_slug.*' => 'string|exists:assessments,slug',
             ]);
 
-            $query = DB::table('assessment_results')
-            ->join('assessments', 'assessment_results.assessment_slug', '=', 'assessments.slug')
-            ->join('subjects', 'assessments.subject_slug', '=', 'subjects.slug')
-            ->where('student_slug', $validated['student_slug'])
-            ->whereIn('assessment_slug', $validated['assessments_slug'])
-            ->select(
-                'assessment_results.slug as result_slug',
-                'assessment_results.assessment_slug as assessment_slug',
-                'assessment_results.student_slug as student_slug',
-                'assessment_results.marks_obtained as marks_obtained',
-                'assessment_results.remarks as remarks',
-                'assessment_results.status as status',
-                'assessment_results.graded_by as graded_by',
-                'assessment_results.graded_at as graded_at',
-                'assessments.title as assessment_name',
-                'subjects.name as subject_name',
-            )->get();
+            $results = DB::table('assessment_results')
+                    ->join('assessments', 'assessment_results.assessment_slug', '=', 'assessments.slug')
+                    ->join('subjects', 'assessments.subject_slug', '=', 'subjects.slug')
+                    ->where('student_slug', $validated['student_slug'])
+                    ->whereIn('assessment_slug', $validated['assessments_slug'])
+                    ->select(
+                        'assessment_results.slug as result_slug',
+                        'assessment_results.assessment_slug as assessment_slug',
+                        'assessment_results.student_slug as student_slug',
+                        'assessment_results.marks_obtained as marks_obtained',
+                        'assessment_results.remarks as remarks',
+                        'assessment_results.status as status',
+                        'assessment_results.graded_by as graded_by',
+                        'assessment_results.graded_at as graded_at',
+                        'assessments.title as assessment_name',
+                        'subjects.name as subject_name',
+                    )->get();
 
             return response()->json([
                 'success' => true,
