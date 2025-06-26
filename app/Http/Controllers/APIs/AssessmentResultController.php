@@ -37,7 +37,7 @@ class AssessmentResultController extends Controller
                     'assessment_results.status as status',
                     'assessment_results.graded_by as graded_by',
                     'assessment_results.graded_at as graded_at',
-                    'assessments.name as assessment_name',
+                    'assessments.title as assessment_name',
                     'subjects.name as subject_name',
                 );
 
@@ -109,7 +109,7 @@ class AssessmentResultController extends Controller
                 'assessment_results.status as status',
                 'assessment_results.graded_by as graded_by',
                 'assessment_results.graded_at as graded_at',
-                'assessments.name as assessment_name',
+                'assessments.title as assessment_name',
                 'subjects.name as subject_name',
             );
                 
