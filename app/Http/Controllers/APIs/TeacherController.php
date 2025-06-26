@@ -28,6 +28,8 @@ class TeacherController extends Controller
             $enrollments = DB::table('weekly_schedules as ws')
                 ->join('student_enrollments as se', 'ws.academic_class_section_slug', '=', 'se.academic_class_section_slug')
                 ->join('academic_class_sections as acs', 'ws.academic_class_section_slug', '=', 'acs.slug')
+                ->join('academic_classes as ac', 'acs.class_slug', '=', 'ac.slug')
+                ->join('sections as sec', 'acs.section_slug', '=', 'sec.slug')
                 ->where('ws.teacher_slug', $validation['owner_slug'])
                 ->where('acs.academic_year_slug', $currentAcademicYear)
                 ->whereNull('se.deleted_at')
@@ -44,6 +46,8 @@ class TeacherController extends Controller
                     'se.admission_date',
                     'se.status',
                     'se.academic_class_section_slug',
+                    'ac.name as class_name',
+                    'sec.name as section_name',
                     'se.academic_info'
                 )
                 ->get();

@@ -113,8 +113,8 @@ class AssessmentController extends Controller
             ->join('assessments as as', 'asr.assessment_slug', '=', 'as.slug')
             ->where('asr.student_slug', $validated['student_slug'])
             ->select(
-                'as.slug as assessment_slug',
-                'as.title as assessment_name',
+                'as.slug as slug',
+                'as.title as name',
             )
             ->get();
 
