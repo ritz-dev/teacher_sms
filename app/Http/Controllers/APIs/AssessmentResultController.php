@@ -29,7 +29,7 @@ class AssessmentResultController extends Controller
                 ->when(!empty($validated['status']), fn($q) => $q->where('status', $validated['status']))
                 ->orderByDesc('created_at')
                 ->select(
-                    'assessment_results.slug as result_slug',
+                    'assessment_results.slug as slug',
                     'assessment_results.assessment_slug as assessment_slug',
                     'assessment_results.student_slug as student_slug',
                     'assessment_results.marks_obtained as marks_obtained',
@@ -102,7 +102,7 @@ class AssessmentResultController extends Controller
                     ->where('student_slug', $validated['student_slug'])
                     ->whereIn('assessment_slug', $validated['assessments_slug'])
                     ->select(
-                        'assessment_results.slug as result_slug',
+                        'assessment_results.slug as slug',
                         'assessment_results.assessment_slug as assessment_slug',
                         'assessment_results.student_slug as student_slug',
                         'assessment_results.marks_obtained as marks_obtained',
