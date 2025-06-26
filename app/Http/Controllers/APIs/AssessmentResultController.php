@@ -100,7 +100,7 @@ class AssessmentResultController extends Controller
             ->join('assessments', 'assessment_results.assessment_slug', '=', 'assessments.slug')
             ->join('subjects', 'assessments.subject_slug', '=', 'subjects.slug')
             ->where('student_slug', $validated['student_slug'])
-            ->whereIn('assessments_slug', $validated['assessment_slug'])
+            ->whereIn('assessment_slug', $validated['assessments_slug'])
             ->select(
                 'assessment_results.slug as result_slug',
                 'assessment_results.assessment_slug as assessment_slug',
