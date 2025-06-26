@@ -21,7 +21,8 @@ class AttendanceController extends Controller
                 ->value('slug');
 
             $attendance = DB::table('academic_attendances')
-                ->where('student_slug', $validated['student_slug'])
+                ->where('attendee_slug', $validated['student_slug'])
+                ->where('attendee_type', 'student')
                 ->where('academic_year_slug', $currentAcademicYear)
                 ->get();
 
