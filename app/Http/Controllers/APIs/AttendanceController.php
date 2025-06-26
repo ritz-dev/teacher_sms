@@ -11,7 +11,7 @@ class AttendanceController extends Controller
     {
         try {
             $validated = $request->validate([
-                'student_slug' => 'required|string|exists:students,slug',
+                'student_slug' => 'required|string',
             ]);
 
             $currentAcademicYear = DB::table('academic_years')
