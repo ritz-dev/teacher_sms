@@ -114,7 +114,7 @@ class AssessmentController extends Controller
             ->where('asr.student_slug', $validated['student_slug'])
             ->select(
                 'as.slug as slug',
-                'as.title as name',
+                'as.title as title',
             )
             ->get();
 
