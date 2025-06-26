@@ -106,8 +106,8 @@ class AssessmentController extends Controller
         try {
 
         $validated = $request->validate([
-                'student_slug' => ['nullable', 'string'],
-            ]);
+            'student_slug' => ['required', 'string'],
+        ]);
 
         $assessments = DB::table('assessment_results as asr')
             ->join('assessments as as', 'asr.assessment_slug', '=', 'as.slug')
