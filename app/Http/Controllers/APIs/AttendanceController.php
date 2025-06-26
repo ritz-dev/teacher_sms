@@ -37,7 +37,7 @@ class AttendanceController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $attendance,
+                'data' => $attendances,
             ]);
         } catch (\Exception $e) {
             return response()->json([
