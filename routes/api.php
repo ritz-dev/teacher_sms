@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\APIs\TeacherController;
 use App\Http\Controllers\APIs\DashboardController;
 use App\Http\Controllers\APIs\AssessmentController;
+use App\Http\Controllers\APIs\AttendanceController;
 use App\Http\Controllers\APIs\AssessmentResultController;
 
 Route::post('dashboard', [DashboardController::class, 'summary']);
@@ -15,6 +16,10 @@ Route::post('academic-class-section', [TeacherController::class, 'getAcademicCla
 Route::post('students/attendance', [TeacherController::class, 'getAttendanceByStudent']);
 Route::post('students/attendance/chart/pie', [TeacherController::class, 'getAttendancePieChart']);
 Route::post('students/attendance/chart/bar', [TeacherController::class, 'getAttendanceBarChart']);
+
+Route::prefix('attendances')->group(function () {
+    Route::post('get-by-student', [AttendanceController::class, 'getAttendanceByStudent']);
+});
 
 Route::prefix('assessments')->group(function () {
     Route::post('', [AssessmentController::class, 'index']);
