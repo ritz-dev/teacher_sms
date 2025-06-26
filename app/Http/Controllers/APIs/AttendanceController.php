@@ -20,10 +20,17 @@ class AttendanceController extends Controller
                 ->where('status', 'In Progress')
                 ->value('slug');
 
-            $attendance = DB::table('academic_attendances')
-                ->where('attendee_slug', $validated['student_slug'])
-                ->where('attendee_type', 'student')
-                ->where('academic_year_slug', $currentAcademicYear)
+            $attendances = DB::table('academic_attendances')
+                ->join('academic_class_sections', 'academic_attendances.academic_class_section_slug', '=', 'academic_class_sections.slug')
+                ->where('academic_attendances.attendee_type', 'student')
+                ->where('academic_class_sections.academic_year_slug', $academicYearSlug)
+                ->select(
+                    'academic_attendances.slug as attendance_slug',
+                    'academic_attendances.date as date',
+                    'academic_attendances.status as status',
+                    'academic_attendances.remark as remark',
+                    'academic_class_sections.slug as academic_class_section_slug',
+                )
                 ->get();
 
             return response()->json([
