@@ -92,14 +92,15 @@ class AssessmentResultController extends Controller
         try {
             $validated = $request->validate([
                 'student_slug' => 'required|string',
-                'assessment_slug' => 'nullable|array',
-                'assessment_slug.*' => 'string|exists:assessments,slug',
+                'assessments_slug' => 'required|array',
+                'assessments_slug.*' => 'string|exists:assessments,slug',
             ]);
 
             $query = DB::table('assessment_results')
             ->join('assessments', 'assessment_results.assessment_slug', '=', 'assessments.slug')
             ->join('subjects', 'assessments.subject_slug', '=', 'subjects.slug')
             ->where('student_slug', $validated['student_slug'])
+            ->whereIn('assessments_slug', $validated['assessment_slug'])
             ->select(
                 'assessment_results.slug as result_slug',
                 'assessment_results.assessment_slug as assessment_slug',
@@ -111,12 +112,7 @@ class AssessmentResultController extends Controller
                 'assessment_results.graded_at as graded_at',
                 'assessments.title as assessment_name',
                 'subjects.name as subject_name',
-            );
-                
-            if (!empty($validated['assessment_slug'])) {
-                $query->whereIn('assessment_slug', $validated['assessment_slug']);
-            }
-            $results = $query->get();
+            )->get();
 
             return response()->json([
                 'success' => true,
