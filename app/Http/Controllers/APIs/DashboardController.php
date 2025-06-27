@@ -70,9 +70,9 @@ class DashboardController extends Controller
                 ->where('assessments.teacher_slug', $validation['owner_slug']);
                 
 
-            $exam = (clone $query)->where('assessments.type', 'Exam')->where('assessments.due_date', '<', Carbon::now()->format('Ymd') )->count();
-            $assignment = (clone $query)->where('assessments.type', 'Assignment')->where('assessments.due_date', '<', Carbon::now()->format('Ymd') )->count();
-            $quiz = (clone $query)->where('assessments.type', 'Quiz')->where('assessments.due_date', '<', Carbon::now()->format('Ymd') )->count();
+            $exam = (clone $query)->where('assessments.type', 'Exam')->where('assessments.due_date', '>=', Carbon::now()->format('Ymd') )->count();
+            $assignment = (clone $query)->where('assessments.type', 'Assignment')->where('assessments.due_date', '>=', Carbon::now()->format('Ymd') )->count();
+            $quiz = (clone $query)->where('assessments.type', 'Quiz')->where('assessments.due_date', '>=', Carbon::now()->format('Ymd') )->count();
 
             return response()->json([
                 'status' => 'success',

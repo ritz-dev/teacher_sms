@@ -111,10 +111,12 @@ class AssessmentController extends Controller
 
         $assessments = DB::table('assessment_results as asr')
             ->join('assessments as as', 'asr.assessment_slug', '=', 'as.slug')
+            ->join('subjects as sub', 'as.subject_slug', '=', 'sub.slug')
             ->where('asr.student_slug', $validated['student_slug'])
             ->select(
                 'as.slug as slug',
                 'as.title as title',
+                'sub.name as subject_name',
             )
             ->get();
 
