@@ -64,6 +64,16 @@ class DashboardController extends Controller
 
             $todaySchedule = $weeklySchedule->where('day_of_week', $today)->values();
             
+            $query = DB::table('assessments')
+                ->join('academic_class_sections as acs', 'assessments.academic_class_section_slug', '=', 'acs.slug')
+                ->where('acs.academic_year_slug', $currentAcademicYear)
+                ->where('assessments.teacher_slug', $validation['owner_slug']);
+                
+
+            $exam = (clone $query)->where('assessments.type', 'Exam')->where('assessments.due_date', '<', Carbon::now()->format('Ymd') )->count();
+            $assignment = (clone $query)->where('assessments.type', 'Assignment')->where('assessments.due_date', '<', Carbon::now()->format('Ymd') )->count();
+            $quiz = (clone $query)->where('assessments.type', 'Quiz')->where('assessments.due_date', '<', Carbon::now()->format('Ymd') )->count();
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Dashboard summary fetched successfully',
@@ -71,7 +81,13 @@ class DashboardController extends Controller
                 'subjects' => $subjects,
                 'today_schedule' => $todaySchedule,
                 'weekly_schedule' => $weeklySchedule,
+                'assessments' => [
+                    'exam' => $exam,
+                    'assignment' => $assignment,
+                    'quiz' => $quiz,
+                ],
             ]);
+
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error fetching dashboard summary',
