@@ -27,7 +27,6 @@ class AssessmentResultController extends Controller
                 ->when(!empty($validated['assessment_slug']), fn($q) => $q->where('assessment_slug', $validated['assessment_slug']))
                 ->when(!empty($validated['student_slug']), fn($q) => $q->where('student_slug', $validated['student_slug']))
                 ->when(!empty($validated['status']), fn($q) => $q->where('status', $validated['status']))
-                ->orderByDesc('created_at')
                 ->select(
                     'assessment_results.slug as slug',
                     'assessment_results.assessment_slug as assessment_slug',
