@@ -80,7 +80,7 @@ class DashboardController extends Controller
                 ->where('aa.approved_slug', $validation['owner_slug']);
             
             $presentCount = (clone $attendance)->where('aa.status', 'Present')->count();
-            $absentCount = (clone $attendance)->where('attendances.status', 'Absent')->count();
+            $absentCount = (clone $attendance)->where('aa.status', 'Absent')->count();
             $lateCount = (clone $attendance)->where('aa.status', 'Late')->count();
             $excusedCount = (clone $attendance)->where('aa.status', 'Excused')->count();
 
