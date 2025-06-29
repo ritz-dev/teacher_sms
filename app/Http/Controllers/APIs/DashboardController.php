@@ -74,15 +74,15 @@ class DashboardController extends Controller
             $assignment = (clone $query)->where('assessments.type', 'Assignment')->where('assessments.due_date', '>=', Carbon::now()->format('Ymd') )->count();
             $quiz = (clone $query)->where('assessments.type', 'Quiz')->where('assessments.due_date', '>=', Carbon::now()->format('Ymd') )->count();
 
-            $attendance = DB::table('attendances')
-                ->join('academic_class_sections as acs', 'attendances.academic_class_section_slug', '=', 'acs.slug')
+            $attendance = DB::table('academic_attendances as aa')
+                ->join('academic_class_sections as acs', 'aa.academic_class_section_slug', '=', 'acs.slug')
                 ->where('acs.academic_year_slug', $currentAcademicYear)
-                ->where('attendances.approved_slug', $validation['owner_slug']);
+                ->where('aa.approved_slug', $validation['owner_slug']);
             
-            $presentCount = (clone $attendance)->where('attendances.status', 'Present')->count();
+            $presentCount = (clone $attendance)->where('aa.status', 'Present')->count();
             $absentCount = (clone $attendance)->where('attendances.status', 'Absent')->count();
-            $lateCount = (clone $attendance)->where('attendances.status', 'Late')->count();
-            $excusedCount = (clone $attendance)->where('attendances.status', 'Excused')->count();
+            $lateCount = (clone $attendance)->where('aa.status', 'Late')->count();
+            $excusedCount = (clone $attendance)->where('aa.status', 'Excused')->count();
 
             return response()->json([
                 'status' => 'success',
