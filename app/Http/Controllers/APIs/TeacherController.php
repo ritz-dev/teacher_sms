@@ -315,6 +315,8 @@ class TeacherController extends Controller
                     'modified_by' => null,
                     'remark' => $item['remark'] ?? null,
 
+                    'approved_slug' => $validated['owner_slug'],
+
                     'previous_hash' => $previousHash,
                     'hash' => $calculatedHash,
 

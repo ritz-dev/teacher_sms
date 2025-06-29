@@ -101,6 +101,7 @@ class DashboardController extends Controller
                     'absent' => $absentCount,
                     'late' => $lateCount,
                     'excused' => $excusedCount,
+                    'total' => $presentCount + $absentCount + $lateCount + $excusedCount
                 ],
             ]);
 
