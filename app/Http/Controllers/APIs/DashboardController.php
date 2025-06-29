@@ -74,6 +74,16 @@ class DashboardController extends Controller
             $assignment = (clone $query)->where('assessments.type', 'Assignment')->where('assessments.due_date', '>=', Carbon::now()->format('Ymd') )->count();
             $quiz = (clone $query)->where('assessments.type', 'Quiz')->where('assessments.due_date', '>=', Carbon::now()->format('Ymd') )->count();
 
+            $attendance = DB::table('attendances')
+                ->join('academic_class_sections as acs', 'attendances.academic_class_section_slug', '=', 'acs.slug')
+                ->where('acs.academic_year_slug', $currentAcademicYear)
+                ->where('attendances.approved_slug', $validation['owner_slug']);
+            
+            $presentCount = (clone $attendance)->where('attendances.status', 'Present')->count();
+            $absentCount = (clone $attendance)->where('attendances.status', 'Absent')->count();
+            $lateCount = (clone $attendance)->where('attendances.status', 'Late')->count();
+            $excusedCount = (clone $attendance)->where('attendances.status', 'Excused')->count();
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Dashboard summary fetched successfully',
@@ -85,6 +95,12 @@ class DashboardController extends Controller
                     'exam' => $exam,
                     'assignment' => $assignment,
                     'quiz' => $quiz,
+                ],
+                'attendance' => [
+                    'present' => $presentCount,
+                    'absent' => $absentCount,
+                    'late' => $lateCount,
+                    'excused' => $excusedCount,
                 ],
             ]);
 
