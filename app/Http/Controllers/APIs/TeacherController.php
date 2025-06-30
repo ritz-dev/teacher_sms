@@ -567,7 +567,7 @@ class TeacherController extends Controller
                 ->where('status', 'In Progress')
                 ->value('slug');
 
-            $weeklySchedule = DB::table('weekly_schedules as ws')
+            $weeklySchedules = DB::table('weekly_schedules as ws')
                 ->join('academic_class_sections as acs', 'ws.academic_class_section_slug', '=', 'acs.slug')
                 ->join('academic_classes as ac', 'acs.class_slug', '=', 'ac.slug')
                 ->join('sections as sec', 'acs.section_slug', '=', 'sec.slug')
