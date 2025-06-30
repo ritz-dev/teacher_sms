@@ -16,7 +16,7 @@ Route::post('academic-class-section', [TeacherController::class, 'getAcademicCla
 Route::post('students/attendance', [TeacherController::class, 'getAttendanceByStudent']);
 Route::post('students/attendance/chart/pie', [TeacherController::class, 'getAttendancePieChart']);
 Route::post('students/attendance/chart/bar', [TeacherController::class, 'getAttendanceBarChart']);
-Route::post('weekly_schedule', [TeacherController::class, 'getWeeklySchedule']);
+Route::post('weekly-schedule', [TeacherController::class, 'getWeeklySchedule']);
 
 Route::prefix('attendances')->group(function () {
     Route::post('get-by-student', [AttendanceController::class, 'getAttendanceByStudent']);
