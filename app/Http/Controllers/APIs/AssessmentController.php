@@ -200,7 +200,7 @@ class AssessmentController extends Controller
                 'success' => true,
                 'message' => 'Assessment created successfully.',
                 'data' => $assessment,
-            ], 201);
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
