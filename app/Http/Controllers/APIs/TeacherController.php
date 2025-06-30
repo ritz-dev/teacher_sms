@@ -555,4 +555,56 @@ class TeacherController extends Controller
             ], 500);
         }
     }
+
+    public function getWeeklySchedule(Request $request) 
+    {
+        $validation = $request->validate([
+            'owner_slug' => 'required|string|max:255',
+        ]);
+
+        try {
+            $currentAcademicYear = DB::table('academic_years')
+                ->where('status', 'In Progress')
+                ->value('slug');
+
+            $weeklySchedule = DB::table('weekly_schedules as ws')
+                ->join('academic_class_sections as acs', 'ws.academic_class_section_slug', '=', 'acs.slug')
+                ->join('academic_classes as ac', 'acs.class_slug', '=', 'ac.slug')
+                ->join('sections as sec', 'acs.section_slug', '=', 'sec.slug')
+                ->where('ws.teacher_slug', $validation['owner_slug'])
+                ->where('acs.academic_year_slug', $currentAcademicYear) // 👈 correct filtering here
+                ->select(
+                    'ws.slug as weekly_schedule_slug',
+                    'ws.academic_class_section_slug',
+                    'ws.day_of_week',
+                    'ac.name as class_name',
+                    'sec.name as section_name',
+                    'ws.subject_name',
+                    'ws.start_time',
+                    'ws.end_time'
+                )
+                ->orderByRaw("FIELD(ws.day_of_week, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')")
+                ->orderBy('ws.start_time')
+                ->get();
+
+
+            if ($weeklySchedules->isEmpty()) {
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [],
+                    'message' => 'No weekly schedules found for this teacher.',
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'data' => $weeklySchedules,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
