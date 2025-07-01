@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\APIs;
 
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\AcademicAttendance;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Http;
 
 class AttendanceController extends Controller
 {
@@ -130,6 +134,7 @@ class AttendanceController extends Controller
         try {
 
             $validated = $request->validate([
+                'owner_slug' => 'required|string|exists:users,slug',
                 'attendances' => 'required|array|min:1',
                 'attendances.*.attendee_type' => 'required|in:student,teacher',
                 'attendances.*.attendee_slug' => 'required|string',
@@ -142,7 +147,6 @@ class AttendanceController extends Controller
                 'attendances.*.remark' => 'nullable|string',
                 'attendances.*.attendance_type' => 'nullable|in:class,exam,event',
                 'attendances.*.date' => 'required|date',
-                'attendances.*.approved_slug' => 'nullable|string', // Assuming no approval slug is provided
             ]);
 
             $inserted = [];
@@ -162,6 +166,7 @@ class AttendanceController extends Controller
                 $formattedDate = (int) Carbon::parse($dateInput)->format('Ymd');
 
                 $data = [
+                    'slug' => (string) Str::uuid(),
                     'weekly_schedule_slug' => $item['weekly_schedule_slug'],
                     'subject' => $item['subject'],
                     'academic_class_section_slug' => $item['academic_class_section_slug'],
@@ -171,7 +176,7 @@ class AttendanceController extends Controller
                     'attendee_type' => $item['attendee_type'],
                     'status' => $item['status'],
                     'attendance_type' => $item['attendance_type'],
-                    'approved_slug' => $item['approved_slug'] ?? null,
+                    'approved_slug' => $validated['owner_slug'] ?? null,
                     'date' => $formattedDate,
                     'modified' => null,
                     'modified_by' => null,
