@@ -18,6 +18,15 @@ Route::post('students/attendance/chart/pie', [TeacherController::class, 'getAtte
 Route::post('students/attendance/chart/bar', [TeacherController::class, 'getAttendanceBarChart']);
 Route::post('weekly-schedule', [TeacherController::class, 'getWeeklySchedule']);
 
+Route::prefix('attendance')->group(function(){
+    Route::post('/',[AttendanceController::class,'index']);
+    Route::post('store',[AttendanceController::class,'store']);
+    Route::post('show',[AttendanceController::class,'show']);
+    Route::post('update',[AttendanceController::class,'update']);
+    Route::post('action',[AttendanceController::class,'handleAction']);
+    Route::post('delete',[AttendanceController::class,'delete']);
+});
+
 Route::prefix('attendances')->group(function () {
     Route::post('get-by-student', [AttendanceController::class, 'getAttendanceByStudent']);
 });
