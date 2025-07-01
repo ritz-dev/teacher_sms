@@ -344,6 +344,54 @@ class AttendanceController extends Controller
         }
     }
 
+    public function handleAction(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'owner_slug' => 'required|string',
+                'slug' => 'required|string|exists:academic_attendances,slug',
+                'status' => 'required|string|in:present,absent,late,excused',
+            ]);
+
+            $attendance = DB::table('academic_attendances')->where('slug', $validated['slug'])->first();
+
+            if (!$attendance) {
+                return response()->json([
+                    'message' => 'Attendance not found.',
+                ], 404);
+            }
+
+            DB::beginTransaction();
+
+            DB::table('academic_attendances')
+            ->where('slug', $validated['slug'])
+            ->update([
+                'status' => $validated['status'],
+                'approved_slug' => $validated['owner_slug'],
+                'modified' => now(),
+                'modified_by' => $validated['owner_slug'],
+                'updated_at' => now(),
+            ]);
+
+            DB::commit();
+
+            $updatedAttendance = DB::table('academic_attendances')->where('slug', $validated['slug'])->first();
+
+            return response()->json([
+                'message' => "Attendance marked as {$updatedAttendance->status} successfully.",
+                'data' => $updatedAttendance
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Failed to perform action on attendance.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function getAttendanceByStudent(Request $request)
     {
         try {
