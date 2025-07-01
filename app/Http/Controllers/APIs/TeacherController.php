@@ -290,6 +290,7 @@ class TeacherController extends Controller
             $formattedDate = (int) Carbon::parse($validated['date'])->format('Ymd');
             $attendanceType = $validated['attendance_type'] ?? 'class';
             $timestamp = now();
+            $approved = $validated['owner_slug'];
 
             $records = [];
 
@@ -315,7 +316,7 @@ class TeacherController extends Controller
                     'modified_by' => null,
                     'remark' => $item['remark'] ?? null,
 
-                    'approved_slug' => $validated['owner_slug'],
+                    'approved_slug' => $approved,
 
                     'previous_hash' => $previousHash,
                     'hash' => $calculatedHash,
@@ -331,7 +332,7 @@ class TeacherController extends Controller
 
             return response()->json([
                 'message' => 'Attendances recorded successfully.',
-                'data' => $records
+                'data' => $approved
             ], 201);
 
         } catch (\Exception $e) {
