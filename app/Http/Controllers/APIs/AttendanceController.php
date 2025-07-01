@@ -86,7 +86,7 @@ class AttendanceController extends Controller
             $attendeeData = [];
 
             foreach ($grouped as $type => $slugs) {
-                $baseUrl = config('services.user_management.url');
+                $baseUrl = config('services.user.url');
                 $endpoint = match ($type) {
                     'student' => "$baseUrl" . "students",
                     'teacher' => "$baseUrl" . "teachers",
@@ -215,7 +215,7 @@ class AttendanceController extends Controller
                 ], 404);
             }
 
-            $baseUrl = config('services.user_management.url');
+            $baseUrl = config('services.user.url');
             $attendeeData = null;
     
             // Only proceed if attendee_type and attendee_slug are set
