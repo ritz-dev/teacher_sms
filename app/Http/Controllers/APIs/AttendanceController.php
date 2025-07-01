@@ -134,7 +134,7 @@ class AttendanceController extends Controller
         try {
 
             $validated = $request->validate([
-                'owner_slug' => 'required|string|exists:users,slug',
+                'owner_slug' => 'required|string',
                 'attendances' => 'required|array|min:1',
                 'attendances.*.attendee_type' => 'required|in:student,teacher',
                 'attendances.*.attendee_slug' => 'required|string',
@@ -274,6 +274,7 @@ class AttendanceController extends Controller
     {
         try {
             $validated = $request->validate([
+                'owner_slug' => 'required|string',
                 'slug' => 'required|string|exists:academic_attendances,slug',
                 'attendee_type' => 'required|in:student,teacher',
                 'attendee_slug' => 'required|string',
@@ -285,7 +286,6 @@ class AttendanceController extends Controller
                 'status' => 'required|in:present,absent,late,excused',
                 'remark' => 'nullable|string',
                 'attendance_type' => 'nullable|in:class,exam,event',
-                'approved_slug' => 'nullable|string',
                 'date' => 'required|date',
             ]);
 
@@ -313,7 +313,7 @@ class AttendanceController extends Controller
                 'attendee_type' => $validated['attendee_type'],
                 'status' => $validated['status'],
                 'attendance_type' => $validated['attendance_type'] ?? 'class',
-                'approved_slug' => $validated['approved_slug'] ?? null,
+                'approved_slug' => $validated['owner_slug'] ?? null,
                 'date' => $formattedDate,
                 'modified' => $timestamp,
                 'modified_by' => auth()->user()?->name ?? 'system',
