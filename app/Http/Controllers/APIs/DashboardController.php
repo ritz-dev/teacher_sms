@@ -76,8 +76,8 @@ class DashboardController extends Controller
 
             $attendance = DB::table('academic_attendances as aa')
                 ->join('academic_class_sections as acs', 'aa.academic_class_section_slug', '=', 'acs.slug')
-                ->where('acs.academic_year_slug', $currentAcademicYear)
-                ->where('aa.approved_slug', $validation['owner_slug']);
+                ->where('acs.academic_year_slug', $currentAcademicYear);
+                // ->where('aa.approved_slug', $validation['owner_slug']);
             
             $presentCount = (clone $attendance)->where('aa.status', 'Present')->count();
             $absentCount = (clone $attendance)->where('aa.status', 'Absent')->count();
@@ -103,6 +103,7 @@ class DashboardController extends Controller
                     'excused' => $excusedCount,
                     'total' => $presentCount + $absentCount + $lateCount + $excusedCount
                 ],
+                'aa' => $attendance->get(),
             ]);
 
         } catch (\Exception $e) {
