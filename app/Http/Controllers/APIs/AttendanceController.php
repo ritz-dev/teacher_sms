@@ -150,38 +150,40 @@ class AttendanceController extends Controller
             DB::beginTransaction();
 
             foreach ($validated['attendances'] as $item) {
-                $previousHash = $this->blockchainService->getPreviousHash(AcademicAttendance::class);
-                $timestamp = now();
-                $calculatedHash = $this->blockchainService->calculateHash(
-                    $previousHash,
-                    json_encode($item),
-                    $timestamp->format('Y-m-d H:i:s')
-                );
+                // $previousHash = $this->blockchainService->getPreviousHash(AcademicAttendance::class);
+                // $timestamp = now();
+                // $calculatedHash = $this->blockchainService->calculateHash(
+                //     $previousHash,
+                //     json_encode($item),
+                //     $timestamp->format('Y-m-d H:i:s')
+                // );
 
                 $dateInput = $item['date']; 
                 $formattedDate = (int) Carbon::parse($dateInput)->format('Ymd');
 
-                $inserted[] = AcademicAttendance::create([
+                $data = [
                     'weekly_schedule_slug' => $item['weekly_schedule_slug'],
                     'subject' => $item['subject'],
                     'academic_class_section_slug' => $item['academic_class_section_slug'],
                     'academic_info' => $item['academic_info'] ?? null,
-        
                     'attendee_slug' => $item['attendee_slug'],
                     'attendee_name' => $item['attendee_name'],
                     'attendee_type' => $item['attendee_type'],
                     'status' => $item['status'],
                     'attendance_type' => $item['attendance_type'],
                     'approved_slug' => $item['approved_slug'] ?? null,
-        
                     'date' => $formattedDate,
                     'modified' => null,
                     'modified_by' => null,
                     'remark' => $item['remark'] ?? null,
-        
-                    'previous_hash' => $previousHash,
-                    'hash' => $calculatedHash,
-                ]);
+                    'previous_hash' => null,
+                    'hash' => null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                $id = DB::table('academic_attendances')->insertGetId($data);
+                $inserted[] = DB::table('academic_attendances')->where('id', $id)->first();
             }
             DB::commit();
 
@@ -207,7 +209,12 @@ class AttendanceController extends Controller
                 'slug' => 'required|string|exists:academic_attendances,slug',
             ]);
 
-            $attendance = AcademicAttendance::where('slug', $validated['slug'])->with(['weeklySchedule', 'academicClassSection'])->firstOrFail();
+            $attendance = DB::table('academic_attendances')
+                ->leftJoin('weekly_schedules', 'academic_attendances.weekly_schedule_slug', '=', 'weekly_schedules.slug')
+                ->leftJoin('academic_class_sections', 'academic_attendances.academic_class_section_slug', '=', 'academic_class_sections.slug')
+                ->where('academic_attendances.slug', $validated['slug'])
+                ->select('academic_attendances.*', 'weekly_schedules.start_time', 'weekly_schedules.end_time', 'academic_class_sections.name as class_section_name')
+                ->first();
 
             if (!$attendance) {
                 return response()->json([
@@ -236,14 +243,14 @@ class AttendanceController extends Controller
                     ]);
 
                     if ($response->successful()) {
-                        $fetched = $response->json('data');
-                        $attendeeData = $fetched;
+                        $attendeeData = $response->json('data');
                     }
                 }
             }
 
-            $attendance->date = Carbon::createFromFormat('Ymd', $attendance->date)->toDateString();
-            $attendance->attendee = $attendeeData;
+            $attendance = (array) $attendance;
+            $attendance['date'] = \Carbon\Carbon::createFromFormat('Ymd', $attendance['date'])->toDateString();
+            $attendance['attendee'] = $attendeeData;
 
             return response()->json([
                 'message' => 'Attendance retrieved successfully.',
@@ -273,11 +280,11 @@ class AttendanceController extends Controller
                 'status' => 'required|in:present,absent,late,excused',
                 'remark' => 'nullable|string',
                 'attendance_type' => 'nullable|in:class,exam,event',
-                'approved_slug' => 'nullable|string', // Assuming no approval slug is provided
+                'approved_slug' => 'nullable|string',
                 'date' => 'required|date',
             ]);
 
-            $attendance = AcademicAttendance::where('slug', $validated['slug'])->firstOrFail();
+            $attendance = DB::table('academic_attendances')->where('slug', $validated['slug'])->first();
 
             if (!$attendance) {
                 return response()->json([
@@ -287,44 +294,39 @@ class AttendanceController extends Controller
 
             DB::beginTransaction();
 
-            $previousHash = $this->blockchainService->getPreviousHash(AcademicAttendance::class);
+            $dateInput = $request->input('date');
+            $formattedDate = (int) \Carbon\Carbon::parse($dateInput)->format('Ymd');
             $timestamp = now();
-            $calculatedHash = $this->blockchainService->calculateHash(
-                $previousHash,
-                json_encode($validated),
-                $timestamp->format('Y-m-d H:i:s')
-            );
 
-            $dateInput = $request->input('date'); 
-            $formattedDate = (int) Carbon::parse($dateInput)->format('Ymd');
-
-            $attendance->update([
+            $updateData = [
                 'weekly_schedule_slug' => $validated['weekly_schedule_slug'],
                 'subject' => $validated['subject'],
                 'academic_class_section_slug' => $validated['academic_class_section_slug'],
                 'academic_info' => $validated['academic_info'] ?? null,
-
                 'attendee_slug' => $validated['attendee_slug'],
                 'attendee_name' => $validated['attendee_name'],
                 'attendee_type' => $validated['attendee_type'],
                 'status' => $validated['status'],
                 'attendance_type' => $validated['attendance_type'] ?? 'class',
                 'approved_slug' => $validated['approved_slug'] ?? null,
-
                 'date' => $formattedDate,
                 'modified' => $timestamp,
                 'modified_by' => auth()->user()?->name ?? 'system',
                 'remark' => $validated['remark'] ?? null,
+                'previous_hash' => null,
+                'hash' => null,
+                'updated_at' => $timestamp,
+            ];
 
-                'previous_hash' => $previousHash,
-                'hash' => $calculatedHash,
-            ]);
+            DB::table('academic_attendances')->where('slug', $validated['slug'])->update($updateData);
 
             DB::commit();
 
+            $updatedAttendance = DB::table('academic_attendances')->where('slug', $validated['slug'])->first();
+
             return response()->json([
                 'message' => 'Attendance updated successfully.',
-                'data' => $attendance
+                'data' => $updatedAttendance
             ], 200);
 
         } catch (\Exception $e) {
