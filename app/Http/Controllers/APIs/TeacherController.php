@@ -273,67 +273,64 @@ class TeacherController extends Controller
         try {
             $validated = $request->validate([
                 'owner_slug' => 'required|string|max:255',
-                'weekly_schedule_slug' => 'required|string|exists:weekly_schedules,slug',
-                'academic_class_section_slug' => 'required|string|exists:academic_class_sections,slug',
-                'attendance_type' => 'nullable|in:class,exam,event',
-                'date' => 'required|date_format:Y-m-d',
                 'attendances' => 'required|array|min:1',
                 'attendances.*.attendee_type' => 'required|in:student,teacher',
                 'attendances.*.attendee_slug' => 'required|string',
+                'attendances.*.weekly_schedule_slug' => 'required|exists:weekly_schedules,slug',
                 'attendances.*.attendee_name' => 'nullable|string',
                 'attendances.*.subject' => 'required|string',
+                'attendances.*.academic_class_section_slug' => 'required|string',
                 'attendances.*.academic_info' => 'nullable|string',
                 'attendances.*.status' => 'required|in:present,absent,late,excused',
                 'attendances.*.remark' => 'nullable|string',
+                'attendances.*.attendance_type' => 'nullable|in:class,exam,event',
+                'attendances.*.date' => 'required|date',
             ]);
 
-            $formattedDate = (int) Carbon::parse($validated['date'])->format('Ymd');
-            $attendanceType = $validated['attendance_type'] ?? 'class';
-            $timestamp = now();
-            $approved = $validated['owner_slug'];
+            $inserted = [];
 
-            $records = [];
+            DB::beginTransaction();
 
             foreach ($validated['attendances'] as $item) {
-                $previousHash =null;
-                $calculatedHash = null;
+                // $previousHash = $this->blockchainService->getPreviousHash(AcademicAttendance::class);
+                // $timestamp = now();
+                // $calculatedHash = $this->blockchainService->calculateHash(
+                //     $previousHash,
+                //     json_encode($item),
+                //     $timestamp->format('Y-m-d H:i:s')
+                // );
 
-                $records[] = [
-                    'slug' => Str::uuid()->toString(),
-                    'weekly_schedule_slug' => $validated['weekly_schedule_slug'],
+                $dateInput = $item['date']; 
+                $formattedDate = (int) Carbon::parse($dateInput)->format('Ymd');
+
+                $inserted[] = AcademicAttendance::create([
+                    'weekly_schedule_slug' => $item['weekly_schedule_slug'],
                     'subject' => $item['subject'],
-                    'academic_class_section_slug' => $validated['academic_class_section_slug'],
+                    'academic_class_section_slug' => $item['academic_class_section_slug'],
                     'academic_info' => $item['academic_info'] ?? null,
-
+        
                     'attendee_slug' => $item['attendee_slug'],
-                    'attendee_name' => $item['attendee_name'] ?? null,
+                    'attendee_name' => $item['attendee_name'],
                     'attendee_type' => $item['attendee_type'],
                     'status' => $item['status'],
-                    'attendance_type' => $attendanceType,
-
+                    'attendance_type' => $item['attendance_type'],
+                    'approved_slug' => $validated['owner_slug'],
+        
                     'date' => $formattedDate,
                     'modified' => null,
                     'modified_by' => null,
                     'remark' => $item['remark'] ?? null,
-
-                    'approved_slug' => $approved,
-
-                    'previous_hash' => $previousHash,
-                    'hash' => $calculatedHash,
-
-                    'created_at' => $timestamp,
-                    'updated_at' => $timestamp,
-                ];
+        
+                    'previous_hash' => null,
+                    'hash' => null,
+                ]);
             }
-
-            DB::beginTransaction();
-            DB::table('academic_attendances')->insert($records);
             DB::commit();
 
             return response()->json([
                 'message' => 'Attendances recorded successfully.',
-                'data' => $approved
-            ], 201);
+                'data' => $inserted
+            ], 200);
 
         } catch (\Exception $e) {
             DB::rollBack();
