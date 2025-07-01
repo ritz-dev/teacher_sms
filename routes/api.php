@@ -11,7 +11,7 @@ Route::post('dashboard', [DashboardController::class, 'summary']);
 Route::post('students', [TeacherController::class, 'getStudent']);
 Route::post('subjects', [TeacherController::class, 'getSubjects']);
 Route::post('student-attendance', [TeacherController::class, 'getStudentAttendance']);
-Route::post('student-attendance/store', [TeacherController::class, 'storeStudentAttendance']);
+Route::post('attendance/store', [TeacherController::class, 'storeStudentAttendance']);
 Route::post('academic-class-section', [TeacherController::class, 'getAcademicClassSection']);
 Route::post('students/attendance', [TeacherController::class, 'getAttendanceByStudent']);
 Route::post('students/attendance/chart/pie', [TeacherController::class, 'getAttendancePieChart']);
