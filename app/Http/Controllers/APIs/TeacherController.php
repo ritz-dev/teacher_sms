@@ -19,6 +19,8 @@ class TeacherController extends Controller
                 'academic_class_section_slug' => 'nullable|string|max:255',
             ]);
 
+            logger($request->owner_slug);
+
             $currentAcademicYear = DB::table('academic_years')
                 // ->where('start_date', '<=', $todayDate)
                 // ->where('end_date', '>=', $todayDate)
