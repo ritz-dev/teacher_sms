@@ -13,6 +13,8 @@ class TeacherController extends Controller
 {
 
     public function getTeacherProfile(Request $request){
+        $teacherApiUrl = config('services.api_gateway.url') . 'me';
+
         $response = Http::withHeaders([
     'Accept' => 'application/json',
     'Authorization' => 'Bearer ' . $request->bearerToken(),
