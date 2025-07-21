@@ -21,7 +21,7 @@ class TeacherController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $teacherApiUrl,
+            'data' => $response,
         ]);
     }
 
