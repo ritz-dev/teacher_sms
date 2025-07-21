@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 
@@ -14,20 +13,11 @@ class TeacherController extends Controller
 {
 
     public function getTeacherProfile(Request $request){
-        $teacherApiUrl = config('services.api_gateway.url') . 'me';
+        $teacher_slug = $request->owner_slug;
 
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-        ])->post($teacherApiUrl);
-
-        Log::error('Teacher profile error response', [
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
-        
         return response()->json([
             'status' => 'success',
-            'data' => $response,
+            'data' => $teacher_slug,
         ]);
     }
 
