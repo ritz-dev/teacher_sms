@@ -7,34 +7,29 @@ use Ramsey\Uuid\Guid\Guid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Teacher extends Model
+class Employee extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
         'slug',
         'personal_slug',
-        'teacher_name',
-        'teacher_code',
+        'employee_name',
+        'employee_code',
         'email',
         'phone',
         'address',
-        'qualification',
-        'subject',
+        'position',
+        'department',
+        'employment_type',
+        'hire_date',
+        'resign_date',
         'experience_years',
         'salary',
-        'hire_date',
         'status',
-        'employment_type',
     ];
 
     protected $hidden = ["id","personal_slug","created_at","updated_at","deleted_at"];
-
-    protected $casts = [
-        'hire_date' => 'date',
-        'salary' => 'decimal:2',
-        'experience_years' => 'integer',
-    ];
 
     protected static function boot()
     {
@@ -47,9 +42,6 @@ class Teacher extends Model
         });
     }
 
-    /**
-     * Relationship to personal info.
-     */
     public function personal()
     {
         return $this->belongsTo(Personal::class, 'personal_slug', 'slug');

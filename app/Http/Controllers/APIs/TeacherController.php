@@ -11,6 +11,18 @@ use Illuminate\Support\Facades\Http;
 
 class TeacherController extends Controller
 {
+
+    public function getTeacherProfile(Request $request){
+        $teacherApiUrl = config('services.api_gateway.url') . 'me';
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+        ]);
+
+        logger($response);
+    }
+
+
     public function getStudent (Request $request) 
     {
         try {
@@ -18,8 +30,6 @@ class TeacherController extends Controller
                 'owner_slug' => 'required|string|max:255',
                 'academic_class_section_slug' => 'nullable|string|max:255',
             ]);
-
-            logger($request->owner_slug);
 
             $currentAcademicYear = DB::table('academic_years')
                 // ->where('start_date', '<=', $todayDate)

@@ -17,6 +17,7 @@ Route::post('students/attendance', [TeacherController::class, 'getAttendanceBySt
 Route::post('students/attendance/chart/pie', [TeacherController::class, 'getAttendancePieChart']);
 Route::post('students/attendance/chart/bar', [TeacherController::class, 'getAttendanceBarChart']);
 Route::post('weekly-schedule', [TeacherController::class, 'getWeeklySchedule']);
+Route::post('teacher-profile',[TeacherController::class,'getTeacherProfile']);
 
 Route::prefix('attendance')->group(function(){
     Route::post('/',[AttendanceController::class,'index']);
