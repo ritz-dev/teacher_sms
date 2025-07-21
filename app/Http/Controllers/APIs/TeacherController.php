@@ -16,22 +16,12 @@ class TeacherController extends Controller
         $teacherApiUrl = config('services.api_gateway.url') . 'me';
 
         $response = Http::withHeaders([
-    'Accept' => 'application/json',
-    'Authorization' => 'Bearer ' . $request->bearerToken(),
-])->post($teacherApiUrl);
-
-if ($response->failed()) {
-    \Log::error('API error response', [
-        'status' => $response->status(),
-        'body' => $response->body(),
-    ]);
-}
-
-return response()->json([
-    'status' => $response->successful() ? 'success' : 'error',
-    'http_code' => $response->status(),
-    'data' => $response->json(),
-]);
+            'Accept' => 'application/json',
+        ])->post($teacherApiUrl);
+        return response()->json([
+            'status' => 'success',
+            'data' => $response->json(),
+        ]);
     }
 
 
