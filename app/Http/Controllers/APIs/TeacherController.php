@@ -19,7 +19,10 @@ class TeacherController extends Controller
             'Accept' => 'application/json',
         ]);
 
-        logger($response);
+        return response()->json([
+            'status' => 'success',
+            'data' => $response,
+        ]);
     }
 
 
