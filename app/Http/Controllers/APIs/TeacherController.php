@@ -17,6 +17,7 @@ class TeacherController extends Controller
 
         $response = Http::withHeaders([
     'Accept' => 'application/json',
+    'Authorization' => 'Bearer ' . $request->bearerToken(),
 ])->post($teacherApiUrl);
 
 if ($response->failed()) {
