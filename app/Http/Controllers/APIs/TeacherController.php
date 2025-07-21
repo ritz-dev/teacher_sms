@@ -17,11 +17,11 @@ class TeacherController extends Controller
 
         $response = Http::withHeaders([
             'Accept' => 'application/json',
-        ]);
+        ])->post($teacherApiUrl);
 
         return response()->json([
             'status' => 'success',
-            'data' => $teacherApiUrl,
+            'data' => $response,
         ]);
     }
 
