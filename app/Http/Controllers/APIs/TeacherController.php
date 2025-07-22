@@ -11,13 +11,19 @@ use Illuminate\Support\Facades\Http;
 
 class TeacherController extends Controller
 {
-
     public function getTeacherProfile(Request $request){
         $teacher_slug = $request->owner_slug;
 
+        $teacherApiUrl = config('services.user.url') . 'teachers/show';
+
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            // 'Authorization' => $request->header('Authorization'),
+        ])->post($teacherApiUrl, ['slug' => $teacher_slug]);
+
         return response()->json([
             'status' => 'success',
-            'data' => $teacher_slug,
+            'data' => $response,
         ]);
     }
 
