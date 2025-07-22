@@ -28,16 +28,7 @@ class TeacherController extends Controller
             'data' => $teacherData,
         ]);
     }
-
-    return response()->json([
-        'status' => 'error',
-        'message' => 'Failed to fetch teacher data.',
-        'http_status' => $teacherData->status(),
-        'error' => $teacherData->body(),
-    ], $teacherData->status());
-    }
-
-
+}
     public function getStudent (Request $request) 
     {
         try {
