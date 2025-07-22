@@ -14,7 +14,7 @@ class TeacherController extends Controller
     public function getTeacherProfile(Request $request){
         $teacher_slug = $request->owner_slug;
 
-        $teacherApiUrl = config('services.user.url') . 'teachers/show';
+        $teacherApiUrl = config('services.user.url') . 'user/teachers/show';
 
         $teacherData = Http::withHeaders([
             'Accept' => 'application/json',
@@ -22,10 +22,9 @@ class TeacherController extends Controller
         ])->post($teacherApiUrl, ['slug' => $teacher_slug]);
 
         if ($teacherData->successful()) {
-        // ✅ Use json() to get actual JSON array, not a string
         return response()->json([
             'status' => 'success',
-            'data' => $teacherData->json(),
+            'data' => $teacherData,
         ]);
     }
 }
