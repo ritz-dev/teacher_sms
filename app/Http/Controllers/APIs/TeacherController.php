@@ -14,7 +14,7 @@ class TeacherController extends Controller
     public function getTeacherProfile(Request $request){
         $teacher_slug = $request->owner_slug;
 
-        $teacherApiUrl = config('services.user.url') . 'user/teachers/show';
+        $teacherApiUrl = config('services.user.url') . 'teachers/show';
 
         $response = Http::withHeaders([
             'Accept' => 'application/json',
