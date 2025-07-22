@@ -16,25 +16,25 @@ class TeacherController extends Controller
 
         $teacherApiUrl = config('services.user.url') . 'teachers/show';
 
-        $response = Http::withHeaders([
+        $teacherData = Http::withHeaders([
             'Accept' => 'application/json',
             // 'Authorization' => $request->header('Authorization'),
         ])->post($teacherApiUrl, ['slug' => $teacher_slug]);
 
-        if ($response->successful()) {
+        if ($teacherData->successful()) {
         // ✅ Use json() to get actual JSON array, not a string
         return response()->json([
             'status' => 'success',
-            'data' => $response->json(),
+            'data' => $teacherData,
         ]);
     }
 
     return response()->json([
         'status' => 'error',
         'message' => 'Failed to fetch teacher data.',
-        'http_status' => $response->status(),
-        'error' => $response->body(),
-    ], $response->status());
+        'http_status' => $teacherData->status(),
+        'error' => $teacherData->body(),
+    ], $teacherData->status());
     }
 
 
