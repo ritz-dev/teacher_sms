@@ -21,10 +21,20 @@ class TeacherController extends Controller
             // 'Authorization' => $request->header('Authorization'),
         ])->post($teacherApiUrl, ['slug' => $teacher_slug]);
 
+        if ($response->successful()) {
+        // ✅ Use json() to get actual JSON array, not a string
         return response()->json([
             'status' => 'success',
-            'data' => $response->body()
+            'data' => $response->json(),
         ]);
+    }
+
+    return response()->json([
+        'status' => 'error',
+        'message' => 'Failed to fetch teacher data.',
+        'http_status' => $response->status(),
+        'error' => $response->body(),
+    ], $response->status());
     }
 
 
