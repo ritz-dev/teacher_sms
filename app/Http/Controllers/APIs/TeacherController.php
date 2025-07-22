@@ -25,7 +25,7 @@ class TeacherController extends Controller
         // ✅ Use json() to get actual JSON array, not a string
         return response()->json([
             'status' => 'success',
-            'data' => $teacherData,
+            'data' => $teacherData->json(),
         ]);
     }
 }
