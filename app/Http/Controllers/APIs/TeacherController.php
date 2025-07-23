@@ -22,9 +22,10 @@ class TeacherController extends Controller
         ])->post($teacherApiUrl, ['slug' => $teacher_slug]);
 
         if ($teacherData->successful()) {
-        return response()->json(
-            $teacherData->json()
-        );
+        return response()->json([
+            'status' => 'success',
+            'data' => $teacherData->json()
+        ]);
     }
 
     return response()->json([
