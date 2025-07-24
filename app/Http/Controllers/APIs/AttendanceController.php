@@ -109,7 +109,10 @@ class AttendanceController extends Controller
             }
 
             $results = $results->map(function ($item) use ($attendeeData) {
-                if (!empty($item->academic_info)) {
+               
+                $attendee = $attendeeData[$item->attendee_type][$item->attendee_slug] ?? null;
+                $data = (array) $item;
+                 if (!empty($item->academic_info)) {
                     preg_match('/Class:\s*(.*?),\s*Section:\s*(.*)$/', $item->academic_info, $matches);
                     if (isset($matches[1])) {
                         $data['class_name'] = $matches[1];
@@ -118,8 +121,6 @@ class AttendanceController extends Controller
                         $data['section_name'] = $matches[2];
                     }
                 }
-                $attendee = $attendeeData[$item->attendee_type][$item->attendee_slug] ?? null;
-                $data = (array) $item;
                 $data['date'] = \Carbon\Carbon::createFromFormat('Ymd', $item->date)->toDateString();
                 $data['attendee'] = $attendee;
                 return $data;
