@@ -24,7 +24,6 @@ class AssessmentResultController extends Controller
             $query = DB::table('assessment_results')
                 ->join('assessments', 'assessment_results.assessment_slug', '=', 'assessments.slug')
                 ->join('subjects', 'assessments.subject_slug', '=', 'subjects.slug')
-                ->join('students','assessments.student_slug','=','students.slug')
                 ->when(!empty($validated['assessment_slug']), fn($q) => $q->where('assessment_slug', $validated['assessment_slug']))
                 ->when(!empty($validated['student_slug']), fn($q) => $q->where('student_slug', $validated['student_slug']))
                 ->when(!empty($validated['status']), fn($q) => $q->where('status', $validated['status']))
@@ -32,8 +31,6 @@ class AssessmentResultController extends Controller
                     'assessment_results.slug as slug',
                     'assessment_results.assessment_slug as assessment_slug',
                     'assessment_results.student_slug as student_slug',
-                    'students.student_name as student_name',
-                    'students.roll_number as roll_number',
                     'assessment_results.marks_obtained as marks_obtained',
                     'assessment_results.remarks as remarks',
                     'assessment_results.status as status',
