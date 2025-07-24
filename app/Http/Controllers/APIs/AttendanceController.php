@@ -83,6 +83,8 @@ class AttendanceController extends Controller
 
             $results = collect($query->get());
 
+            logger($results);
+
             $grouped = $results->groupBy('attendee_type')->map(function ($items) {
                 return collect($items)->pluck('attendee_slug')->unique()->values()->all();
             });
