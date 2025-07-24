@@ -24,6 +24,7 @@ class AssessmentResultController extends Controller
             $query = DB::table('assessment_results')
                 ->join('assessments', 'assessment_results.assessment_slug', '=', 'assessments.slug')
                 ->join('subjects', 'assessments.subject_slug', '=', 'subjects.slug')
+                ->join('students','assessments.student_slug','=','students.slug')
                 ->when(!empty($validated['assessment_slug']), fn($q) => $q->where('assessment_slug', $validated['assessment_slug']))
                 ->when(!empty($validated['student_slug']), fn($q) => $q->where('student_slug', $validated['student_slug']))
                 ->when(!empty($validated['status']), fn($q) => $q->where('status', $validated['status']))
