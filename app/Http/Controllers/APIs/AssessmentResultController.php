@@ -73,10 +73,10 @@ class AssessmentResultController extends Controller
                         if (!empty($item->student_slug) && isset($studentData[$item->student_slug])) {
                             $student = $studentData[$item->student_slug];
                             $data['student_name'] = $student['student_name'] ?? null;
-                            $data['student_number'] = $student['student_number'] ?? null;
+                            $data['roll_number'] = $student['roll_number'] ?? null;
                         } else {
                             $data['student_name'] = null;
-                            $data['student_number'] = null;
+                            $data['roll_number'] = null;
                         }
 
                         return $data;
