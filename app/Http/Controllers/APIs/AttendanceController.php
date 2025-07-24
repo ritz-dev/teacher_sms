@@ -83,8 +83,6 @@ class AttendanceController extends Controller
 
             $results = collect($query->get());
 
-            logger($results);
-
             $grouped = $results->groupBy('attendee_type')->map(function ($items) {
                 return collect($items)->pluck('attendee_slug')->unique()->values()->all();
             });
@@ -115,6 +113,17 @@ class AttendanceController extends Controller
                 $data = (array) $item;
                 $data['date'] = \Carbon\Carbon::createFromFormat('Ymd', $item->date)->toDateString();
                 $data['attendee'] = $attendee;
+
+                if (!empty($item->academic_info)) {
+                    preg_match('/Class:\s*(.*?),\s*Section:\s*(.*)$/', $item->academic_info, $matches);
+                    if (isset($matches[1])) {
+                        $data['class_name'] = $matches[1];
+                    }
+                    if (isset($matches[2])) {
+                        $data['section_name'] = $matches[2];
+                    }
+                }
+
                 return $data;
             });
 
