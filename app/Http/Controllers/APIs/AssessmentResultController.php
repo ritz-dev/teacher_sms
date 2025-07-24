@@ -53,34 +53,35 @@ class AssessmentResultController extends Controller
                 ->unique()
                 ->values()
                 ->all();
-                    $studentData = [];
-                    if (!empty($studentSlugs)) {
-                        $baseUrl = config('services.user.url'); // Make sure this is set in config/services.php
-                        $endpoint = $baseUrl . 'user/students';
+            
+            $studentData = [];
+            if (!empty($studentSlugs)) {
+                $baseUrl = config('services.user.url'); // Make sure this is set in config/services.php
+                $endpoint = $baseUrl . 'user/students';
 
-                        $response = Http::withHeaders([
-                            'Accept' => 'application/json',
-                        ])->post($endpoint, ['slug' => $studentSlugs]);
+                $response = Http::withHeaders([
+                    'Accept' => 'application/json',
+                ])->post($endpoint, ['slugs' => $studentSlugs]);
 
-                        if ($response->successful()) {
-                            $studentData = collect($response->json('data'))->keyBy('slug')->toArray();
-                        }
-                    }
+                if ($response->successful()) {
+                    $studentData = collect($response->json('data'))->keyBy('slug')->toArray();
+                }
+            }
 
-                    $results = collect($results)->map(function ($item) use ($studentData) {
-                        $data = (array) $item;
+            $results = collect($results)->map(function ($item) use ($studentData) {
+                $data = (array) $item;
 
-                        if (!empty($item->student_slug) && isset($studentData[$item->student_slug])) {
-                            $student = $studentData[$item->student_slug];
-                            $data['student_name'] = $student['student_name'] ?? null;
-                            $data['student_number'] = $student['student_number'] ?? null;
-                        } else {
-                            $data['student_name'] = null;
-                            $data['student_number'] = null;
-                        }
+                if (!empty($item->student_slug) && isset($studentData[$item->student_slug])) {
+                    $student = $studentData[$item->student_slug];
+                    $data['student_name'] = $student['student_name'] ?? null;
+                    $data['student_number'] = $student['student_number'] ?? null;
+                } else {
+                    $data['student_name'] = null;
+                    $data['student_number'] = null;
+                }
 
-                        return $data;
-                    });
+                return $data;
+            });
 
             return response()->json([
                 'success' => true,
