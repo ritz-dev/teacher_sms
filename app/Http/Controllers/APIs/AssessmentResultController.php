@@ -56,11 +56,11 @@ class AssessmentResultController extends Controller
                     $studentData = [];
                     if (!empty($studentSlugs)) {
                         $baseUrl = config('services.user.url'); // Make sure this is set in config/services.php
-                        $endpoint = $baseUrl . 'students';
+                        $endpoint = $baseUrl . 'user/students';
 
                         $response = Http::withHeaders([
                             'Accept' => 'application/json',
-                        ])->post($endpoint, ['slugs' => $studentSlugs]);
+                        ])->post($endpoint, ['slug' => $studentSlugs]);
 
                         if ($response->successful()) {
                             $studentData = collect($response->json('data'))->keyBy('slug')->toArray();
