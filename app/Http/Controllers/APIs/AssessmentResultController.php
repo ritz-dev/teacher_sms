@@ -56,39 +56,50 @@ class AssessmentResultController extends Controller
             
             $studentData = [];
             if (!empty($studentSlugs)) {
-                $baseUrl = config('services.user.url'); // Make sure this is set in config/services.php
-                $endpoint = $baseUrl . 'user/students';
+        $baseUrl = config('services.user.url');
+        $endpoint = rtrim($baseUrl, '/') . '/user/students'; // ensure trailing slash issue is handled
 
-                $response = Http::withHeaders([
-                    'Accept' => 'application/json',
-                ])->post($endpoint, ['slug' => $studentSlugs]);
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+        ])->post($endpoint, ['slug' => $studentSlugs]);
 
-                if ($response->successful()) {
-                    $studentData = collect($response->json('data'))->keyBy('slug')->toArray();
-                }
-            }
+        if ($response->successful()) {
+            $studentData = collect($response->json('data'))->keyBy('slug')->toArray();
+        } else {
+            \Log::error('Student API failed', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'sent' => ['slug' => $studentSlugs],
+            ]);
+            throw new \Exception('Failed to fetch students from user service');
+        }
+    }
 
-            $results = collect($results)->map(function ($item) use ($studentData) {
-                $data = (array) $item;
+    $results = collect($results)->map(function ($item) use ($studentData) {
+        $data = (array) $item;
 
-                if (!empty($item->student_slug) && isset($studentData[$item->student_slug])) {
-                    $student = $studentData[$item->student_slug];
-                    $data['student_name'] = $student['student_name'] ?? null;
-                    $data['student_number'] = $student['student_number'] ?? null;
-                } else {
-                    $data['student_name'] = null;
-                    $data['student_number'] = null;
-                }
+        if (!empty($item->student_slug) && isset($studentData[$item->student_slug])) {
+            $student = $studentData[$item->student_slug];
+            $data['student_name'] = $student['student_name'] ?? null;
+            $data['student_number'] = $student['student_number'] ?? null;
+        } else {
+            $data['student_name'] = null;
+            $data['student_number'] = null;
+        }
 
-                return $data;
-            });
+        return $data;
+    });
 
             return response()->json([
                 'success' => true,
                 'total' => $total,
                 'data' => $results,
             ]);
-        } catch (\Exception $e) {
+        }catch (\Exception $e) {
+            \Log::error('Error in fetching assessment results', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch assessment results.',
