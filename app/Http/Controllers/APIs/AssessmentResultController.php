@@ -31,6 +31,8 @@ class AssessmentResultController extends Controller
                     'assessment_results.slug as slug',
                     'assessment_results.assessment_slug as assessment_slug',
                     'assessment_results.student_slug as student_slug',
+                    'assessment_results.student_name as student_name',
+                    'assessment_results.roll_number as roll_number',
                     'assessment_results.marks_obtained as marks_obtained',
                     'assessment_results.remarks as remarks',
                     'assessment_results.status as status',
