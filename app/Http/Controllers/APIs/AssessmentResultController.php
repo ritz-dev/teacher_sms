@@ -61,7 +61,7 @@ class AssessmentResultController extends Controller
 
                 $response = Http::withHeaders([
                     'Accept' => 'application/json',
-                ])->post($endpoint, ['slugs' => $studentSlugs]);
+                ])->post($endpoint, ['slug' => $studentSlugs]);
 
                 if ($response->successful()) {
                     $studentData = collect($response->json('data'))->keyBy('slug')->toArray();
