@@ -39,7 +39,7 @@ class AssessmentResultController extends Controller
                     'assessment_results.graded_at as graded_at',
                     'assessments.title as assessment_name',
                     'subjects.name as subject_name',
-                    'student_enrollments.name as student_name',
+                    'student_enrollments.student_name as student_name',
                     'student_enrollments.roll_number as roll_number'
                 );
 
