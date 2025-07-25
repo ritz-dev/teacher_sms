@@ -24,6 +24,7 @@ class AssessmentResultController extends Controller
             $query = DB::table('assessment_results')
                 ->join('assessments', 'assessment_results.assessment_slug', '=', 'assessments.slug')
                 ->join('subjects', 'assessments.subject_slug', '=', 'subjects.slug')
+                ->join('student_enrollments','assessment_results.student_slug','=','student_enrollments.student_slug')
                 ->when(!empty($validated['assessment_slug']), fn($q) => $q->where('assessment_slug', $validated['assessment_slug']))
                 ->when(!empty($validated['student_slug']), fn($q) => $q->where('student_slug', $validated['student_slug']))
                 ->when(!empty($validated['status']), fn($q) => $q->where('status', $validated['status']))
@@ -38,6 +39,8 @@ class AssessmentResultController extends Controller
                     'assessment_results.graded_at as graded_at',
                     'assessments.title as assessment_name',
                     'subjects.name as subject_name',
+                    'student_enrollments.name as student_name',
+                    'student_enrollments.roll_number as roll_number'
                 );
 
             $total = (clone $query)->count();
