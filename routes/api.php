@@ -6,6 +6,32 @@ use App\Http\Controllers\APIs\DashboardController;
 use App\Http\Controllers\APIs\AssessmentController;
 use App\Http\Controllers\APIs\AttendanceController;
 use App\Http\Controllers\APIs\AssessmentResultController;
+use Illuminate\Support\Facades\DB;
+
+// Health check endpoint
+Route::get('/health', function () {
+    try {
+        // Check database connection
+        DB::connection()->getPdo();
+        $dbStatus = 'connected';
+    } catch (\Exception $e) {
+        $dbStatus = 'disconnected';
+    }
+    
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toISOString(),
+        'service' => 'Teacher Service',
+        'version' => '1.0.0',
+        'database' => $dbStatus,
+        'environment' => app()->environment()
+    ], 200);
+});
+
+// Simple ping endpoint
+Route::get('/ping', function () {
+    return response()->json(['message' => 'pong'], 200);
+});
 
 Route::post('dashboard', [DashboardController::class, 'summary']);
 Route::post('students', [TeacherController::class, 'getStudent']);
